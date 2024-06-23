@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 
 interface CardDashboardI {
     title: string;
-    total: string;
+    total: number;
     rate?: string;
     levelUp?: boolean;
     levelDown?: boolean;
