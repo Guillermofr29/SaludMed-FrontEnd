@@ -1,43 +1,26 @@
 import { ApexOptions } from 'apexcharts';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
-
-interface ChartQuantityBySexI {
-    series: {
-        name: string;
-        data: number[];
-    }[];
-}
+import axiosInstance from '../../api/axiosConfig';
 
 const ChartQuantityBySex: React.FC = () => {
-    const [state, setState] = useState<ChartQuantityBySexI>({
-        series: [
-            {
-                name: 'Masculino',
-                data: [44],
-            },
-            {
-                name: 'Femenino',
-                data: [55],
-            },
-        ],
-    });
+    const [state, setState] = useState<{ mujeres: number; hombres: number }>({ mujeres: 0, hombres: 0 });
 
-    const updateData = () => {
-        const newData = [Math.floor(Math.random() * 100), Math.floor(Math.random() * 100)];
-        setState({
-            series: [
-                {
-                    name: 'Masculino',
-                    data: [newData[0]],
-                },
-                {
-                    name: 'Femenino',
-                    data: [newData[1]],
-                },
-            ],
-        });
-    };
+    useEffect(() => {
+        const fetchGenderData = async () => {
+            try {
+                const response = await axiosInstance.get('/Paciente/ContarGeneroPacientes');
+                setState({
+                    mujeres: response.data.mujeres,
+                    hombres: response.data.hombres,
+                });
+            } catch (err) {
+                console.error('Error fetching gender data:', err);
+            }
+        };
+
+        fetchGenderData();
+    }, []);
 
     const options: ApexOptions = {
         chart: {
@@ -102,30 +85,22 @@ const ChartQuantityBySex: React.FC = () => {
         ],
     };
 
+    const series = [
+        { name: 'Masculino', data: [state.hombres], colors: '#7EB9FF' },
+        { name: 'Femenino', data: [state.mujeres], colors: '#FF7EFA' },
+    ];
+
     return (
         <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6">
             <div className="mb-3 justify-between gap-4 sm:flex">
                 <div>
-                    <h5 className="text-xl font-semibold text-black dark:text-white">
-                        Cantidad por Sexo
-                    </h5>
+                    <h5 className="text-xl font-semibold text-black dark:text-white">Cantidad por Sexo</h5>
                 </div>
-                <button
-                    onClick={updateData}
-                    className="mt-3 sm:mt-0 px-4 py-2 bg-blue-500 text-white rounded-lg"
-                >
-                    Actualizar Datos
-                </button>
             </div>
 
             <div className="mb-2">
                 <div id="chartBar" className="mx-auto flex justify-center">
-                    <ReactApexChart
-                        options={options}
-                        series={state.series}
-                        type="bar"
-                        height={350}
-                    />
+                    <ReactApexChart options={options} series={series} type="bar" height={350} />
                 </div>
             </div>
         </div>

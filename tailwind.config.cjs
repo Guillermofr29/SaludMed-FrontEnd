@@ -22,6 +22,8 @@ module.exports = {
       },
       colors: {
         /*Colores perzonalizados*/
+        blueChart: '#7EB9FF',
+        pinkChart: '#FF7EFA',
         blue: '#063D54',
         hoverBlue: '#0E5979',
         borderBlue: '#2197C8',
