@@ -75,19 +75,16 @@ const PatientAdd = () => {
 
         const { nombre, apellido, correo, sexo, domicilio, edad, estatura, telefono } = formData;
 
-        // Validar campos requeridos
         if (!nombre || !apellido || !correo || !sexo || !domicilio || !edad || !estatura || !telefono) {
             showAlert('Error', 'Los campos no deben estar vacíos', 'error');
             return;
         }
 
-        // Validar errores de formato
         if (Object.values(formErrors).some((error) => error)) {
             showAlert('Error', 'Por favor corrige los errores en el formulario', 'error');
             return;
         }
 
-        // Intentar agregar paciente
         await addPatient(formData);
     };
 

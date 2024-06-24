@@ -3,6 +3,9 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
+
+import NotFound from './pages/NotFound';
+
 import Dashboard from './pages/Dashboard/Dashboard';
 
 import Patients from './pages/Patients/Patients';
@@ -59,6 +62,15 @@ function App() {
             <>
               <PageTitle title="Agregar Paciente | SaludMed" />
               <PatientAdd />
+            </>
+          }
+        />
+        <Route
+          path="/*"
+          element={
+            <>
+              <PageTitle title="Not Found | SaludMed" />
+              <NotFound />
             </>
           }
         />
