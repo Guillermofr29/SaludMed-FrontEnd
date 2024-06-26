@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -16,12 +16,13 @@ module.exports = {
     },
     extend: {
       borderRadius: {
-        '10': '10px',
-        'top': '10px 10px 0 0',
-
+        10: '10px',
+        top: '10px 10px 0 0',
       },
       colors: {
         /*Colores perzonalizados*/
+        customBlue: '#063D54',
+        secondBlue: '#03B0C1',
         blueChart: '#7EB9FF',
         pinkChart: '#FF7EFA',
         blue: '#063D54',
@@ -270,4 +271,4 @@ module.exports = {
     },
   },
   plugins: [],
-}
+};

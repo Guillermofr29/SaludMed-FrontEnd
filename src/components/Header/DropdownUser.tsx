@@ -1,12 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faRightFromBracket, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faRightFromBracket,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
 
 import UserOne from '../../images/user/user-1.jpg';
 
-const DropdownUser = () => {
+interface DropdownUserProps {
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
+}
+
+const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
@@ -37,6 +46,11 @@ const DropdownUser = () => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    navigate('/login');
+  };
+
   return (
     <div className="relative">
       <Link
@@ -53,10 +67,14 @@ const DropdownUser = () => {
         </span>
 
         <span className="h-12 w-12 rounded-full overflow-hidden">
-          <img src={UserOne} alt="User" className="h-full w-full object-cover"/>
+          <img
+            src={UserOne}
+            alt="User"
+            className="h-full w-full object-cover"
+          />
         </span>
 
-        <FontAwesomeIcon icon={faChevronDown}/>
+        <FontAwesomeIcon icon={faChevronDown} />
       </Link>
 
       {/* <!-- Dropdown Start --> */}
@@ -79,9 +97,12 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        >
           Log Out
-        <FontAwesomeIcon icon={faRightFromBracket} />
+          <FontAwesomeIcon icon={faRightFromBracket} />
         </button>
       </div>
       {/* <!-- Dropdown End --> */}
