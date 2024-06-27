@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -11,9 +11,11 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Patients from './pages/Patients/Patients';
 import PatientEdit from './pages/Patients/PatientEdit';
 import PatientAdd from './pages/Patients/PatientAdd';
+import Login from './pages/Login';
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -30,39 +32,61 @@ function App() {
     <>
       <Routes>
         <Route
-          index
+          path="/login"
+          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+        />
+        <Route
+          path="/"
           element={
             <>
-              <PageTitle title="Inicio | SaludMed" />
-              <Dashboard />
+              {isAuthenticated ? (
+                <>
+                  <PageTitle title="Inicio | SaludMed" />
+                  <Dashboard setIsAuthenticated={setIsAuthenticated} />
+                </>
+              ) : (
+                <Navigate to="/login" />
+              )}
             </>
           }
         />
         <Route
           path="/pacientes"
           element={
-            <>
-              <PageTitle title="Pacientes | SaludMed" />
-              <Patients />
-            </>
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Pacientes | SaludMed" />
+                <Patients setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
-        <Route 
-          path="/pacientes/editar-paciente/:id" 
+        <Route
+          path="/pacientes/editar-paciente/:id"
           element={
-          <>
-            <PageTitle title="Editar Pacientes | SaludMed" />
-            <PatientEdit />
-          </>
-          } 
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Editar Pacientes | SaludMed" />
+                <PatientEdit setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route
           path="/pacientes/agregar-paciente"
           element={
-            <>
-              <PageTitle title="Agregar Paciente | SaludMed" />
-              <PatientAdd />
-            </>
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Agregar Paciente | SaludMed" />
+                <PatientAdd setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route
