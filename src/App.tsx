@@ -37,21 +37,67 @@ function App() {
         />
         <Route
           path="/"
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+          element={
+            <>
+              {isAuthenticated ? (
+                <>
+                  <PageTitle title="Inicio | SaludMed" />
+                  <Dashboard setIsAuthenticated={setIsAuthenticated} />
+                </>
+              ) : (
+                <Navigate to="/login" />
+              )}
+            </>
+          }
         />
         <Route
           path="/pacientes"
-          element={isAuthenticated ? <Patients /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Pacientes | SaludMed" />
+                <Patients setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route
           path="/pacientes/editar-paciente/:id"
-          element={isAuthenticated ? <PatientEdit /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Editar Pacientes | SaludMed" />
+                <PatientEdit setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
         <Route
           path="/pacientes/agregar-paciente"
-          element={isAuthenticated ? <PatientAdd /> : <Navigate to="/login" />}
+          element={
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Agregar Paciente | SaludMed" />
+                <PatientAdd setIsAuthenticated={setIsAuthenticated} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
         />
-        <Route path="/*" element={<NotFound />} />
+        <Route
+          path="/*"
+          element={
+            <>
+              <PageTitle title="Not Found | SaludMed" />
+              <NotFound />
+            </>
+          }
+        />
       </Routes>
     </>
   );

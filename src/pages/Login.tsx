@@ -9,7 +9,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [correo, setCorreo] = useState<string>('');
   const [contraseña, setContraseña] = useState<string>('');
-  const navigate = useNavigate(); // Add this line
+  const navigate = useNavigate(); 
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -20,7 +20,7 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
       });
       if (response.status === 200) {
         setIsAuthenticated(true);
-        navigate('/'); // Add this line to redirect to the dashboard
+        navigate('/'); 
       }
     } catch (error) {
       console.error('Error logging in', error);
