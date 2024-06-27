@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPenToSquare, faUserPlus, faMagnifyingGlass, faCaretLeft, faCaretRight, faTrash } from '@fortawesome/free-solid-svg-icons';
-import ReactPaginate from 'react-paginate';
-import useGetPatients from '../../../hooks/Patients/useGetPatients';
 import { Patient } from '../../../interfaces/Patients/Patients';
-import { showDeleteConfirmation, showDeleteSuccessAlert, showErrorAlert } from '../../../components/Alerts/PatientAlert'; // Importa las funciones de alerta
+import useGetPatients from '../../../hooks/Patients/useGetPatients';
+import { showDeleteConfirmation, showDeleteSuccessAlert, showErrorAlert } from '../../../components/Alerts/PatientAlert';
 
 const itemsPerPage = 6;
+const maxPageNumbers = 4;
 
 const PatientTable: React.FC = () => {
     const { patients: initialPatients, loading, error, deletePatient } = useGetPatients();
@@ -49,8 +49,8 @@ const PatientTable: React.FC = () => {
         navigate(`/pacientes/editar-paciente/${id}`);
     };
 
-    const handlePageClick = (selectedItem: { selected: number }) => {
-        setCurrentPage(selectedItem.selected);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     const handleDeletePatient = async (id: number) => {
@@ -66,8 +66,10 @@ const PatientTable: React.FC = () => {
         }
     };
 
-    const offset = currentPage * itemsPerPage;
-    const currentPatients = patients.slice(offset, offset + itemsPerPage);
+    const totalPages = Math.ceil(patients.length / itemsPerPage);
+    const startIndex = currentPage * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, patients.length);
+    const currentPatients = patients.slice(startIndex, endIndex);
 
     if (loading) {
         return <p>Cargando...</p>;
@@ -76,6 +78,36 @@ const PatientTable: React.FC = () => {
     if (error) {
         return <p>{error}</p>;
     }
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        if (totalPages <= maxPageNumbers) {
+            for (let i = 0; i < totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            const halfMaxPages = Math.floor(maxPageNumbers / 2);
+            let startPage = Math.max(0, currentPage - halfMaxPages);
+            let endPage = startPage + maxPageNumbers - 1;
+
+            if (endPage >= totalPages) {
+                startPage = Math.max(0, totalPages - maxPageNumbers);
+                endPage = totalPages - 1;
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pageNumbers.push(i);
+            }
+
+            if (startPage > 0) {
+                pageNumbers.unshift('...');
+            }
+            if (endPage < totalPages - 1) {
+                pageNumbers.push('...');
+            }
+        }
+        return pageNumbers;
+    };
 
     return (
         <div className="overflow-x-auto rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -104,22 +136,31 @@ const PatientTable: React.FC = () => {
                     <FontAwesomeIcon className="p-2" icon={faUserPlus} />
                 </button>
 
-                <ReactPaginate
-                    previousLabel={<FontAwesomeIcon icon={faCaretLeft} />}
-                    nextLabel={<FontAwesomeIcon icon={faCaretRight} />}
-                    breakLabel={'...'}
-                    pageCount={Math.ceil(patients.length / itemsPerPage)}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={3}
-                    onPageChange={handlePageClick}
-                    containerClassName={'flex justify-center mt-4'}
-                    pageClassName={'mx-1 px-3 py-1 border rounded cursor-pointer'}
-                    activeClassName={'bg-black text-white dark:text-black dark:bg-white'}
-                    previousClassName={'mx-1 px-3 py-1 border rounded cursor-pointer'}
-                    nextClassName={'mx-1 px-3 py-1 border rounded cursor-pointer'}
-                    breakClassName={'mx-1 px-3 py-1 border rounded cursor-pointer'}
-                />
-
+                <div className="flex items-center">
+                    <button
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 0}
+                        className="mx-1 px-3 py-1 border rounded cursor-pointer"
+                    >
+                        <FontAwesomeIcon icon={faCaretLeft} />
+                    </button>
+                    {getPageNumbers().map((page, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handlePageChange(typeof page === 'number' ? page : currentPage)}
+                            className={`mx-1 px-3 py-1 border rounded cursor-pointer ${currentPage === page ? 'bg-black text-white dark:text-black dark:bg-white' : ''}`}
+                        >
+                            {page === '...' ? '...' : (typeof page === 'number' ? `${page + 1}` : '')}
+                        </button>
+                    ))}
+                    <button
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages - 1}
+                        className="mx-1 px-3 py-1 border rounded cursor-pointer"
+                    >
+                        <FontAwesomeIcon icon={faCaretRight} />
+                    </button>
+                </div>
             </div>
             {currentPatients.length === 0 ? (
                 <p className="text-center text-gray-500 mt-4">Paciente no encontrado.</p>

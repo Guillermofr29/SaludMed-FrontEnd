@@ -23,8 +23,22 @@ function App() {
   }, [pathname]);
 
   useEffect(() => {
+    const authState = localStorage.getItem('isAuthenticated');
+    if (authState === 'true') {
+      setIsAuthenticated(true);
+    }
     setTimeout(() => setLoading(false), 1000);
   }, []);
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+  };
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+    localStorage.setItem('isAuthenticated', 'true');
+  };
 
   return loading ? (
     <Loader />
@@ -33,7 +47,7 @@ function App() {
       <Routes>
         <Route
           path="/login"
-          element={<Login setIsAuthenticated={setIsAuthenticated} />}
+          element={<Login setIsAuthenticated={handleLogin} />}
         />
         <Route
           path="/"
@@ -42,7 +56,7 @@ function App() {
               {isAuthenticated ? (
                 <>
                   <PageTitle title="Inicio | SaludMed" />
-                  <Dashboard setIsAuthenticated={setIsAuthenticated} />
+                  <Dashboard setIsAuthenticated={handleLogout} />
                 </>
               ) : (
                 <Navigate to="/login" />
@@ -56,7 +70,7 @@ function App() {
             isAuthenticated ? (
               <>
                 <PageTitle title="Pacientes | SaludMed" />
-                <Patients setIsAuthenticated={setIsAuthenticated} />
+                <Patients setIsAuthenticated={handleLogout} />
               </>
             ) : (
               <Navigate to="/login" />
@@ -69,7 +83,7 @@ function App() {
             isAuthenticated ? (
               <>
                 <PageTitle title="Editar Pacientes | SaludMed" />
-                <PatientEdit setIsAuthenticated={setIsAuthenticated} />
+                <PatientEdit setIsAuthenticated={handleLogout} />
               </>
             ) : (
               <Navigate to="/login" />
@@ -82,7 +96,7 @@ function App() {
             isAuthenticated ? (
               <>
                 <PageTitle title="Agregar Paciente | SaludMed" />
-                <PatientAdd setIsAuthenticated={setIsAuthenticated} />
+                <PatientAdd setIsAuthenticated={handleLogout} />
               </>
             ) : (
               <Navigate to="/login" />
