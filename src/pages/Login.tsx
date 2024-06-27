@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/axiosConfig';
+// import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserDoctor, faLock } from '@fortawesome/free-solid-svg-icons';
+import useAuthentication from '../hooks/Login/useLogin';
 
 interface LoginProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -9,23 +11,12 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [correo, setCorreo] = useState<string>('');
   const [contraseña, setContraseña] = useState<string>('');
-  const navigate = useNavigate(); 
+  // const navigate = useNavigate();
+  const { error, handleLogin } = useAuthentication({ setIsAuthenticated });
 
-  const handleLogin = async (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    try {
-      const response = await axiosInstance.post('/api/auth/login', {
-        correo,
-        contraseña,
-      });
-      if (response.status === 200) {
-        setIsAuthenticated(true);
-        navigate('/'); 
-      }
-    } catch (error) {
-      console.error('Error logging in', error);
-      alert('Correo o contraseña incorrectos');
-    }
+    handleLogin(correo, contraseña);
   };
 
   return (
@@ -45,8 +36,8 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
 
       <div className="flex-1 bg-customBlue flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-80">
-          <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
-          <form onSubmit={handleLogin}>
+          <h2 className="text-2xl font-semibold mb-4 text-blue text-center">Login</h2>
+          <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label
                 htmlFor="correo"
@@ -54,14 +45,20 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
               >
                 Usuario
               </label>
-              <input
-                type="text"
-                id="correo"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
-                placeholder="MED00001"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-2.5">
+                  <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                </span>
+                <input
+                  type="text"
+                  id="correo"
+                  value={correo}
+                  onChange={(e) => setCorreo(e.target.value)}
+                  className="mt-1 block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                  placeholder="med@saludmed.com"
+                  autoComplete="username"
+                />
+              </div>
             </div>
             <div className="mb-6">
               <label
@@ -70,14 +67,23 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
               >
                 Contraseña
               </label>
-              <input
-                type="password"
-                id="contraseña"
-                value={contraseña}
-                onChange={(e) => setContraseña(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
-                placeholder="Password"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-2.5">
+                  <FontAwesomeIcon icon={faLock} opacity="0.8" />
+                </span>
+                <input
+                  type="password"
+                  id="contraseña"
+                  value={contraseña}
+                  onChange={(e) => setContraseña(e.target.value)}
+                  className="mt-1 block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                  placeholder="Password"
+                  autoComplete="current-password"
+                />
+              </div>
+              {error && (
+                <p className="mt-1.5 text-xs text-center font-bold text-red-500">{error}</p>
+              )}
             </div>
             <button
               type="submit"
