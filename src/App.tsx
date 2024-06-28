@@ -13,6 +13,9 @@ import PatientEdit from './pages/Patients/PatientEdit';
 import PatientAdd from './pages/Patients/PatientAdd';
 import Login from './pages/Login';
 
+const INACTIVITY_TIME = 300000; //Esto es 5 minutos
+//60000 1 minuto
+
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -28,6 +31,31 @@ function App() {
       setIsAuthenticated(true);
     }
     setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  useEffect(() => {
+    const handleUnload = () => {
+      localStorage.removeItem('isAuthenticated');
+    };
+
+    const handleUserActivity = () => {
+      clearTimeout(inactivityTimeout);
+      inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
+    };
+
+    let inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
+
+    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('mousemove', handleUserActivity);
+    window.addEventListener('keypress', handleUserActivity);
+    window.addEventListener('scroll', handleUserActivity);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('mousemove', handleUserActivity);
+      window.removeEventListener('keypress', handleUserActivity);
+      window.removeEventListener('scroll', handleUserActivity);
+    };
   }, []);
 
   const handleLogout = () => {
