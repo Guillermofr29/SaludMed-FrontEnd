@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserDoctor, faLock } from '@fortawesome/free-solid-svg-icons';
 import useAuthentication from '../hooks/Login/useLogin';
@@ -11,8 +10,9 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [correo, setCorreo] = useState<string>('');
   const [contraseña, setContraseña] = useState<string>('');
-  // const navigate = useNavigate();
-  const { error, handleLogin } = useAuthentication({ setIsAuthenticated });
+  const { error, loading, handleLogin } = useAuthentication({
+    setIsAuthenticated,
+  });
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -36,7 +36,9 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
 
       <div className="flex-1 bg-customBlue flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-80">
-          <h2 className="text-2xl font-semibold mb-4 text-blue text-center">Login</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-blue text-center">
+            Login
+          </h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
               <label
@@ -82,14 +84,40 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
                 />
               </div>
               {error && (
-                <p className="mt-1.5 text-xs text-center font-bold text-red-500">{error}</p>
+                <p className="mt-1.5 text-xs text-center font-bold text-red-500">
+                  {error}
+                </p>
               )}
             </div>
             <button
               type="submit"
-              className="w-full bg-customBlue text-white py-2 px-4 rounded-md hover:bg-secondBlue"
+              className="w-full bg-customBlue text-white py-2 px-4 rounded-md hover:bg-secondBlue flex items-center justify-center"
+              disabled={loading}
             >
-              Iniciar sesión
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"
+                  ></path>
+                </svg>
+              ) : (
+                'Iniciar sesión'
+              )}
             </button>
           </form>
         </div>
