@@ -3,7 +3,7 @@ import Swal from 'sweetalert2';
 export const showConfirmationAlert = async (): Promise<boolean> => {
     const result = await Swal.fire({
         title: '¿Estás seguro?',
-        text: 'Se realizarán cambios en el paciente. ¿Desea continuar?',
+        text: 'Se realizarán cambios en la cita. ¿Desea continuar?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Aceptar',
@@ -28,7 +28,7 @@ export const showSuccessAlert = (): void => {
 export const showDeleteConfirmation = async (): Promise<boolean> => {
     const result = await Swal.fire({
         title: '¿Estás seguro?',
-        text: `Se eliminará al paciente ${name} de forma permanente. ¿Desea continuar?`,
+        text: 'Se eliminará la cita de forma permanente. ¿Desea continuar?',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Eliminar',
@@ -42,7 +42,7 @@ export const showDeleteConfirmation = async (): Promise<boolean> => {
 export const showDeleteSuccessAlert = (): void => {
     Swal.fire({
         title: '¡Eliminado!',
-        text: 'El paciente ha sido eliminado correctamente.',
+        text: 'La cita ha sido eliminada correctamente.',
         icon: 'success',
         timer: 3000,
         timerProgressBar: true,

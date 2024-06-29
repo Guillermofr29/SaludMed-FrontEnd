@@ -8,10 +8,12 @@ interface UseAuthenticationProps {
 
 const useAuthentication = ({ setIsAuthenticated }: UseAuthenticationProps) => {
     const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
     const handleLogin = async (correo: string, contraseña: string) => {
+        setLoading(true);
         try {
             const response = await axiosInstance.post('api/auth/login', {
                 correo,
@@ -25,11 +27,14 @@ const useAuthentication = ({ setIsAuthenticated }: UseAuthenticationProps) => {
         } catch (error) {
             console.error('Ocurrió un error: ', error);
             setError('Correo o contraseña incorrectos');
+        } finally{
+            setLoading(false);
         }
     };
 
     return {
         error,
+        loading,
         handleLogin,
     };
 };

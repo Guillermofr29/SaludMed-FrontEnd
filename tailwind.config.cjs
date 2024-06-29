@@ -17,6 +17,7 @@ module.exports = {
     extend: {
       borderRadius: {
         10: '10px',
+        5: '5px',
         top: '10px 10px 0 0',
       },
       colors: {

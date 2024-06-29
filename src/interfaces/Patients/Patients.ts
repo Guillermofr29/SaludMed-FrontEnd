@@ -1,4 +1,4 @@
-export type Patient = {
+export interface Patient {
     iD_Paciente: number;
     nombre: string;
     apellido: string;
