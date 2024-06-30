@@ -1,34 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import BreadcrumbPatien from '../../components/Breadcrumbs/BreadcrumbPatient';
+import BreadcrumbPatients from '../../components/Breadcrumbs/BreadcrumbPatient';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUser,
-  faCake,
-  faPhone,
-  faMapMarkerAlt,
-  faVenusMars,
-  faChevronDown,
-  faWeightScale,
-  faArrowsUpDown,
-  faEnvelope,
-} from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCake, faPhone, faMapMarkerAlt, faTrash, faVenusMars, faChevronDown, faWeightScale, faArrowsUpDown, faEnvelope, } from '@fortawesome/free-solid-svg-icons';
 import useFetchPatient from '../../hooks/Patients/useFetchPatient';
 import useUpdatePatient from '../../hooks/Patients/useUpdatePatient';
 import useGetPatients from '../../hooks/Patients/useGetPatients';
 import { Patient } from '../../interfaces/Patients/Patients';
-import {
-  showConfirmationAlert,
-  showSuccessAlert,
-  showErrorAlert,
-  showDeleteConfirmation,
-  showDeleteSuccessAlert,
-} from '../../components/Alerts/PatientAlert';
-import {
-  validateName,
-  validateEmail,
-} from '../../components/Validations/Patients/PatientValidation';
+import { showConfirmationAlert, showSuccessAlert, showErrorAlert, showDeleteConfirmation, showDeleteSuccessAlert, showAlert, } from '../../components/Alerts/PatientAlert';
+import { validateOnlyString, validateEmail, validatePhoneNumber, validateAge, validateHeight, validateWeight } from '../../components/Validations/Patients/PatientValidation';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -47,11 +28,20 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   } = useUpdatePatient();
   const { deletePatient } = useGetPatients();
 
-  const [formData, setFormData] = useState<Patient | null>(null);
   const [, setSelectedOption] = useState<string | undefined>(undefined);
-  const [nameError, setNameError] = useState<string | null>(null);
-  const [lastNameError, setLastNameError] = useState<string | null>(null);
-  const [emailError, setEmailError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<Patient>({
+    iD_Paciente: 0,
+    nombre: '',
+    apellido: '',
+    sexo: '',
+    edad: 0,
+    peso: 0,
+    estatura: 0,
+    telefono: '',
+    domicilio: '',
+    correo: '',
+  });
 
   useEffect(() => {
     if (patient) {
@@ -60,51 +50,67 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     }
   }, [patient]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value } = e.target;
-    if (name === 'nombre') {
-      if (!validateName(value)) {
-        setNameError('El nombre solo puede contener letras y espacios');
-      } else {
-        setNameError(null);
-      }
-    } else if (name === 'apellido') {
-      if (!validateName(value)) {
-        setLastNameError('El apellido solo puede contener letras y espacios');
-      } else {
-        setLastNameError(null);
-      }
-    } else if (name === 'correo') {
-      if (!validateEmail(value)) {
-        setEmailError('El correo electrónico no tiene un formato válido');
-      } else {
-        setEmailError(null);
-      }
-    }
+  const [formErrors, setFormErrors] = useState({
+    nombre: '',
+    apellido: '',
+    correo: '',
+    telefono: '',
+    edad: '',
+    peso: '',
+    estatura: ''
+  });
 
-    if (formData) {
-      setFormData({
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({
         ...formData,
-        [name]:
-          name === 'edad' || name === 'peso' || name === 'estatura'
-            ? parseFloat(value)
+        [name]: name === 'edad' || name === 'peso' || name === 'estatura'
+            ? Number(value)
             : value,
-      });
-    }
-  };
+    });
+
+    const validationError = (() => {
+        switch (name) {
+            case 'nombre':
+                return validateOnlyString(value);
+            case 'apellido':
+                return validateOnlyString(value);
+            case 'correo':
+                return validateEmail(value);
+            case 'telefono':
+                return validatePhoneNumber(value);
+            case 'edad':
+                return validateAge(Number(value));
+            case 'peso':
+                return validateWeight(Number(value));
+            case 'estatura':
+                return validateHeight(Number(value));
+            default:
+                return null;
+        }
+    })();
+
+    setFormErrors({
+        ...formErrors,
+        [name]: validationError || '',
+    });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !validateName(formData?.nombre || '') ||
-      !validateName(formData?.apellido || '') ||
-      !validateEmail(formData?.correo || '')
-    ) {
-      alert(
-        'Por favor, corrija los errores en el formulario antes de continuar.',
+    const { nombre, apellido, correo, sexo, domicilio, edad, estatura, telefono } = formData;
+
+    if (!nombre || !apellido || !correo || !sexo || !domicilio || !edad || !estatura || !telefono) {
+      showAlert('Error', 'No tienen que haber campos vacíos', 'error');
+      return;
+    }
+
+    if (Object.values(formErrors).some((error) => error)) {
+      showAlert(
+        'Error',
+        'Por favor corrige los errores en el formulario antes de continuar.',
+        'error',
       );
       return;
     }
@@ -150,7 +156,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   return (
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
       <div className="mx-auto max-w-270">
-        <BreadcrumbPatien pageName="Editar Paciente" />
+        <BreadcrumbPatients pageName="Editar Paciente" />
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -162,9 +168,10 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
               <div className="p-7">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+
                     <div className="w-full sm:w-1/2">
                       <label
-                        className="mb-3 text-sm font-medium text-black dark:text-white"
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="nombre"
                       >
                         Nombre
@@ -174,17 +181,15 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faUser} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${nameError ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.nombre ? 'border-red-500' : ''}`}
                           type="text"
                           name="nombre"
-                          id="nombre"
-                          placeholder="Nombre"
                           value={formData?.nombre || ''}
                           onChange={handleChange}
                         />
-                        {nameError && (
+                        {formErrors.nombre && (
                           <p className="mt-1 text-xs text-red-500">
-                            {nameError}
+                            {formErrors.nombre}
                           </p>
                         )}
                       </div>
@@ -202,7 +207,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faUser} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${lastNameError ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.apellido ? 'border-red-500' : ''}`}
                           type="text"
                           name="apellido"
                           id="apellido"
@@ -210,9 +215,9 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           value={formData?.apellido || ''}
                           onChange={handleChange}
                         />
-                        {lastNameError && (
+                        {formErrors.apellido && (
                           <p className="mt-1 text-xs text-red-500">
-                            {lastNameError}
+                            {formErrors.apellido}
                           </p>
                         )}
                       </div>
@@ -254,21 +259,28 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="edad"
                       >
-                        Edad
+                        Edad value= {formData?.edad || 0}
                       </label>
                       <div className="relative">
                         <span className="absolute left-4.5 top-4">
                           <FontAwesomeIcon icon={faCake} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="edad"
                           id="edad"
+                          min={0}
+                          max={125}
+                          placeholder="0"
                           value={formData?.edad || 0}
                           onChange={handleChange}
-                          min={0}
                         />
+                        {formErrors.edad && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.edad}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -284,7 +296,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faWeightScale} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="peso"
                           id="peso"
@@ -293,6 +305,11 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           min={0}
                           step="0.01"
                         />
+                        {formErrors.peso && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.peso}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -311,7 +328,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="estatura"
                           id="estatura"
@@ -320,6 +337,11 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           min={0}
                           step="0.01"
                         />
+                        {formErrors.estatura && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.estatura}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -337,13 +359,18 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faPhone} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="telefono"
                           id="telefono"
                           value={formData?.telefono || ''}
                           onChange={handleChange}
                         />
+                        {formErrors.telefono && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.telefono}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -362,7 +389,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="domicilio"
                           id="domicilio"
@@ -384,16 +411,16 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faEnvelope} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${emailError ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.correo ? 'border-red-500' : ''}`}
                           type="email"
                           name="correo"
                           id="correo"
                           value={formData?.correo || ''}
                           onChange={handleChange}
                         />
-                        {emailError && (
+                        {formErrors.correo && (
                           <p className="mt-1 text-xs text-red-500">
-                            {emailError}
+                            {formErrors.correo}
                           </p>
                         )}
                       </div>
@@ -415,11 +442,11 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       Guardar
                     </button>
                     <button
-                      className="flex justify-center rounded bg-red-600 py-2 px-6 font-medium text-white hover:bg-opacity-90"
+                      className="flex justify-center rounded bg-red-600 py-3 px-6 font-medium text-white hover:bg-opacity-90"
                       type="button"
                       onClick={handleDelete}
                     >
-                      Eliminar
+                      <FontAwesomeIcon icon={faTrash} />
                     </button>
                   </div>
                 </form>

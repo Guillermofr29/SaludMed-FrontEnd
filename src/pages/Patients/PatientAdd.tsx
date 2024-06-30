@@ -15,8 +15,12 @@ import {
   faEnvelope,
 } from '@fortawesome/free-solid-svg-icons';
 import {
-  validateName,
+  validateOnlyString,
   validateEmail,
+  validatePhoneNumber,
+  validateWeight,
+  validateHeight,
+  validateAge,
 } from '../../components/Validations/Patients/PatientValidation';
 import useAddPatient from '../../hooks/Patients/useAddPatient';
 import { showAlert } from '../../components/Alerts/PatientAlert';
@@ -47,6 +51,10 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     nombre: '',
     apellido: '',
     correo: '',
+    telefono: '',
+    edad: '',
+    peso: '',
+    estatura: ''
   });
 
   useEffect(() => {
@@ -62,74 +70,56 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     }
   }, [success, navigate]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]:
-        name === 'edad' || name === 'peso' || name === 'estatura'
-          ? Number(value)
-          : value,
+      [name]: name === 'edad' || name === 'peso' || name === 'estatura'
+        ? Number(value)
+        : value,
     });
 
-    if (name === 'nombre') {
-      setFormErrors({
-        ...formErrors,
-        nombre: validateName(value)
-          ? ''
-          : 'El nombre solo puede contener letras y espacios',
-      });
-    } else if (name === 'apellido') {
-      setFormErrors({
-        ...formErrors,
-        apellido: validateName(value)
-          ? ''
-          : 'El apellido solo puede contener letras y espacios',
-      });
-    } else if (name === 'correo') {
-      setFormErrors({
-        ...formErrors,
-        correo: validateEmail(value)
-          ? ''
-          : 'El correo electrónico no tiene un formato válido',
-      });
-    }
-  };
+    // Validaciones específicas para cada campo
+    const validationError = (() => {
+      switch (name) {
+        case 'nombre':
+          return validateOnlyString(value);
+        case 'apellido':
+          return validateOnlyString(value);
+        case 'correo':
+          return validateEmail(value);
+        case 'telefono':
+          return validatePhoneNumber(value);
+        case 'edad':
+          return validateAge(Number(value));
+        case 'peso':
+          return validateWeight(Number(value));
+        case 'estatura':
+          return validateHeight(Number(value));
+        default:
+          return null;
+      }
+    })();
 
+    setFormErrors({
+      ...formErrors,
+      [name]: validationError || '',
+    });
+  };
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const {
-      nombre,
-      apellido,
-      correo,
-      sexo,
-      domicilio,
-      edad,
-      estatura,
-      telefono,
-    } = formData;
+    const { nombre, apellido, correo, sexo, domicilio, edad, estatura, telefono } = formData;
 
-    if (
-      !nombre ||
-      !apellido ||
-      !correo ||
-      !sexo ||
-      !domicilio ||
-      !edad ||
-      !estatura ||
-      !telefono
-    ) {
-      showAlert('Error', 'Los campos no deben estar vacíos', 'error');
+    if (!nombre || !apellido || !correo || !sexo || !domicilio || !edad || !estatura || !telefono) {
+      showAlert('Error', 'No tienen que haber campos vacíos', 'error');
       return;
     }
 
     if (Object.values(formErrors).some((error) => error)) {
       showAlert(
         'Error',
-        'Por favor corrige los errores en el formulario',
+        'Por favor corrige los errores en el formulario antes de continuar.',
         'error',
       );
       return;
@@ -157,9 +147,10 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
               <div className="p-7">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+
                     <div className="w-full sm:w-1/2">
                       <label
-                        className="mb-3 text-sm font-medium text-black dark:text-white"
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="nombre"
                       >
                         Nombre
@@ -169,11 +160,11 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faUser} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.nombre ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.nombre ? 'border-red-500' : ''}`}
                           type="text"
                           name="nombre"
                           id="nombre"
-                          placeholder="Nombre"
+                          placeholder="Nombre(s)"
                           value={formData.nombre}
                           onChange={handleChange}
                         />
@@ -197,7 +188,7 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faUser} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.apellido ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.apellido ? 'border-red-500' : ''}`}
                           type="text"
                           name="apellido"
                           id="apellido"
@@ -254,14 +245,21 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faCake} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="edad"
-                          id="edad"
+                          
                           min={0}
-                          value={formData.edad}
+                          max={125}
+                          placeholder="0"
+                          value={formData.edad !== 0 ? formData.edad : ''}
                           onChange={handleChange}
                         />
+                        {formErrors.edad && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.edad}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -277,15 +275,21 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faWeight} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="peso"
                           id="peso"
                           min={0}
+                          placeholder='0.00 Kgs'
                           step="0.01"
-                          value={formData.peso}
+                          value={formData.peso !== 0 ? formData.peso : ''}
                           onChange={handleChange}
                         />
+                        {formErrors.peso && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.peso}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -301,15 +305,21 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faArrowsAltV} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="estatura"
                           id="estatura"
                           min={0}
                           step="0.01"
-                          value={formData.estatura}
+                          placeholder='0.00 Mts'
+                          value={formData.estatura !== 0 ? formData.estatura : ''}
                           onChange={handleChange}
                         />
+                        {formErrors.estatura && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.estatura}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -327,13 +337,19 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faPhone} opacity="0.8" />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="telefono"
+                          placeholder='+52 (123) 456-7890'
                           id="telefono"
                           value={formData.telefono}
                           onChange={handleChange}
                         />
+                        {formErrors.telefono && (
+                          <p className="mt-1 text-xs text-red-500">
+                            {formErrors.telefono}
+                          </p>
+                        )}
                       </div>
                     </div>
 
@@ -352,9 +368,10 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           />
                         </span>
                         <input
-                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          className="w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="text"
                           name="domicilio"
+                          placeholder='Av. 1 Calle 2, Colonia Centro, Ciudad'
                           id="domicilio"
                           value={formData.domicilio}
                           onChange={handleChange}
@@ -374,9 +391,10 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           <FontAwesomeIcon icon={faEnvelope} opacity="0.8" />
                         </span>
                         <input
-                          className={`w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.correo ? 'border-red-500' : ''}`}
+                          className={`w-full rounded border border-stroke  py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${formErrors.correo ? 'border-red-500' : ''}`}
                           type="email"
                           name="correo"
+                          placeholder='mail@mail.com'
                           id="correo"
                           value={formData.correo}
                           onChange={handleChange}
