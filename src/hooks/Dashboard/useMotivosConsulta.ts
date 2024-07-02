@@ -6,7 +6,7 @@ interface MotivoConsulta {
     numeroDeVeces: number;
 }
 
-const useMotivosConsulta = () => {
+const useMotivosConsulta = (medicoID: number) => {
     const [data, setData] = useState<MotivoConsulta[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,7 @@ const useMotivosConsulta = () => {
     useEffect(() => {
         const fetchMotivosConsulta = async () => {
             try {
-                const response = await axiosInstance.get('/Cita/CincoMotivosConsultaMasComunes');
+                const response = await axiosInstance.get(`/Cita/CincoMotivosConsultaMasComunes?medicoID=${medicoID}`);
                 setData(response.data.result);
             } catch (err) {
                 setError('Error al obtener los motivos de consulta más comunes');
@@ -24,7 +24,7 @@ const useMotivosConsulta = () => {
         };
 
         fetchMotivosConsulta();
-    }, []);
+    }, [medicoID]);
 
     return { data, loading, error };
 };

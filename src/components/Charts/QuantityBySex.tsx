@@ -4,12 +4,13 @@ import ReactApexChart from 'react-apexcharts';
 import axiosInstance from '../../api/axiosConfig';
 
 const ChartQuantityBySex: React.FC = () => {
+    const MedicoID = localStorage.getItem('userId') || 'Id';
     const [state, setState] = useState<{ mujeres: number; hombres: number }>({ mujeres: 0, hombres: 0 });
 
     useEffect(() => {
         const fetchGenderData = async () => {
             try {
-                const response = await axiosInstance.get('/Paciente/ContarGeneroPacientes');
+                const response = await axiosInstance.get(`Paciente/ContarGeneroPacientes?medicoID=${MedicoID}`);
                 setState({
                     mujeres: response.data.mujeres,
                     hombres: response.data.hombres,
@@ -20,7 +21,7 @@ const ChartQuantityBySex: React.FC = () => {
         };
 
         fetchGenderData();
-    }, []);
+    }, [MedicoID]);
 
     const options: ApexOptions = {
         chart: {

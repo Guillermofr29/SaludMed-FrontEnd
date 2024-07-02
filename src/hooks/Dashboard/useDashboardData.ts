@@ -7,7 +7,7 @@ interface DashboardData {
   pendingAppointments: number;
 }
 
-const useDashboardData = () => {
+const useDashboardData = (medicoID: number) => {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,9 +15,9 @@ const useDashboardData = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const responsePatients = await axiosInstance.get('/Paciente/TotalPacientes');
-        const responseTotalAppointments = await axiosInstance.get('/Cita/TotalCitas');
-        const responsePendingAppointments = await axiosInstance.get('/Cita/CitasPendientes');
+        const responsePatients = await axiosInstance.get(`/Paciente/TotalPacientes?medicoID=${medicoID}`);
+        const responseTotalAppointments = await axiosInstance.get(`/Cita/TotalCitas?medicoID=${medicoID}`);
+        const responsePendingAppointments = await axiosInstance.get(`/Cita/CitasPendientes?medicoID=${medicoID}`);
 
         setData({
           totalPatients: responsePatients.data.result,
@@ -32,7 +32,7 @@ const useDashboardData = () => {
     };
 
     fetchData();
-  }, []);
+  }, [medicoID]);
 
   return { data, loading, error };
 };

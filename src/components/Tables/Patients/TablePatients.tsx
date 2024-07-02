@@ -10,7 +10,8 @@ const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
 const PatientTable: React.FC = () => {
-    const { patients: initialPatients, loading, error, deletePatient } = useGetPatients();
+    const MedicoID = localStorage.getItem('userId') || 'Id';
+    const { patients: initialPatients, loading, error, deletePatient } = useGetPatients(Number(MedicoID));
     const [patients, setPatients] = useState<Patient[]>(initialPatients);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
@@ -112,7 +113,7 @@ const PatientTable: React.FC = () => {
     return (
         <div className="overflow-x-auto rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
-                Listado de Pacientes
+                Hitorial de Pacientes
             </h4>
             <div className="flex items-center justify-between flex-col flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 dark:border-strokedark dark:bg-boxdark">
                 <div className="relative">
@@ -168,15 +169,15 @@ const PatientTable: React.FC = () => {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                     <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {/* <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 ID
-                            </th>
+                            </th> */}
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Nombre
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Apellidos
-                            </th>
+                            {/* <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Médico
+                            </th> */}
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Sexo
                             </th>
@@ -193,6 +194,9 @@ const PatientTable: React.FC = () => {
                                 Teléfono
                             </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Correo
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Acciones
                             </th>
                         </tr>
@@ -200,15 +204,15 @@ const PatientTable: React.FC = () => {
                     <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
                         {currentPatients.map((patient) => (
                             <tr key={patient.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.iD_Paciente}
-                                </td>
+                                </td> */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.nombre}
+                                    {patient.nombre} {patient.apellido}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.apellido}
-                                </td>
+                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {patient.nombreMedico}
+                                </td> */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.sexo}
                                 </td>
@@ -223,6 +227,9 @@ const PatientTable: React.FC = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.telefono}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {patient.correo}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button className="text-meta-5" onClick={() => handleEditPatient(patient.iD_Paciente)}>
