@@ -4,7 +4,8 @@ import ReactApexChart from 'react-apexcharts';
 import useMotivosConsulta from '../../hooks/Dashboard/useMotivosConsulta';
 
 const ChartMostCommonDiseases: React.FC = () => {
-    const { data, loading, error } = useMotivosConsulta();
+    const MedicoID = localStorage.getItem('userId') || 'Id';
+    const { data, loading, error } = useMotivosConsulta(Number(MedicoID));
 
     if (loading) {
         return <div>Cargando...</div>;

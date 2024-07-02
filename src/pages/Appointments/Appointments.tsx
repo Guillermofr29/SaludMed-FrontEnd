@@ -3,7 +3,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import CalendarAppointments from '../../components/Calendar/Calendar';
 import AppointmentsTable from '../../components/Tables/Appointments/TableAppointments';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDays } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarDay, faCalendarDays, faClock} from '@fortawesome/free-solid-svg-icons';
 import useGetAppointments from '../../hooks/Appointments/useGetAppointments';
 import useGetNextAppointments from '../../hooks/Appointments/useGetNextAppointments';
 import { nextAppointments } from '../../interfaces/Appointments/nextAppointments';
@@ -13,8 +13,10 @@ interface DashboardProps {
 }
 
 const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
-    const { appointments, loading, error } = useGetAppointments();
-    const { nextAppointments, loading: loadingNext, error: errorNext } = useGetNextAppointments();
+    const medicoID = localStorage.getItem('userId') || 'Id';
+    const rolID = localStorage.getItem('rolID') || 'rolID'
+    const { appointments, loading, error } = useGetAppointments(Number(medicoID));
+    const { nextAppointments, loading: loadingNext, error: errorNext } = useGetNextAppointments(Number(medicoID), Number(rolID));
 
     if (loading || loadingNext) {
         return <p>Cargando citas...</p>;
@@ -54,7 +56,7 @@ const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             {appointment.nombrePaciente}
                                         </p>
                                         <p className="text-gray-500 dark:text-gray-400">
-                                            (Fecha: {appointment.fecha} | Hora: {appointment.hora} hrs)
+                                            <FontAwesomeIcon className='pl-1' icon={faCalendarDay} /> {appointment.fecha} | {appointment.hora} hrs <FontAwesomeIcon className='pl-1' icon={faClock} />
                                         </p>
                                     </div>
                                 </li>

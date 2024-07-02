@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosConfig';
 import { Appointments } from '../../interfaces/Appointments/Appointments';
 
-const useGetAppointments = () => {
+const useGetAppointments = (medicoID: number) => {
     const [appointments, setAppointments] = useState<Appointments[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -10,17 +10,17 @@ const useGetAppointments = () => {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const response = await axiosInstance.get('Cita');
+                const response = await axiosInstance.get(`Cita?medicoID=${medicoID}`);
                 setAppointments(response.data.result);
             } catch (err) {
-                setError('Error al obtener las citas');
+                setError(`Error al obtener las citas ${medicoID}`);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchAppointments();
-    }, []);
+    }, [medicoID]);
 
     return { appointments, loading, error, setAppointments };
 };

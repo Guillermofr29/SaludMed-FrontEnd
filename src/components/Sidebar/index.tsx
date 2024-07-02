@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import Logo from '../../images/logo/logoWhite.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGaugeSimpleHigh, faUserInjured, faCalendar, faFileWaveform } from '@fortawesome/free-solid-svg-icons';
+import { faGaugeSimpleHigh, faUserInjured, faCalendar, faFileWaveform, faUserDoctor, faPills } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -10,6 +10,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
+  // const rol = localStorage.getItem('rolID') || 'rolId';
   const location = useLocation();
   const { pathname } = location;
 
@@ -63,7 +64,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
         }`}
     >
       {/* <!-- SIDEBAR HEADER --> */}
-      <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5">
+      <div className="flex items-center justify-center gap-2 px-6 py-5.5 lg:py-6.5">
         <NavLink to="/" style={{ textAlign: 'center' }}>
           <img src={Logo} alt="Logo" width={'200px'} />
         </NavLink>
@@ -110,6 +111,34 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                   Dashboard
                 </NavLink>
               </li>
+
+              {/* {rol === '2' && (
+                <>
+                  <li>
+                    <NavLink
+                      to="/medicos"
+                      className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${(pathname.includes('medicos')) &&
+                        'bg-hoverBlue border-r-4 border-borderBlue'
+                        }`}
+                    >
+                      <FontAwesomeIcon icon={faUserDoctor} />
+                      Médicos
+                    </NavLink>
+                  </li>
+
+                  <li>
+                    <NavLink
+                      to="/medicamentos"
+                      className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${(pathname.includes('medicamentos')) &&
+                        'bg-hoverBlue border-r-4 border-borderBlue'
+                        }`}
+                    >
+                      <FontAwesomeIcon icon={faPills} />
+                      Medicamentos
+                    </NavLink>
+                  </li>
+                </>
+              )} */}
 
               {/* <!-- Menu Item Pacientes --> */}
               <li>

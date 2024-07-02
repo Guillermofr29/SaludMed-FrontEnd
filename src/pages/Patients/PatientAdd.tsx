@@ -3,27 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import BreadcrumbPatient from '../../components/Breadcrumbs/BreadcrumbPatient';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUser,
-  faCake,
-  faPhone,
-  faMapMarkerAlt,
-  faVenusMars,
-  faChevronDown,
-  faWeight,
-  faArrowsAltV,
-  faEnvelope,
-} from '@fortawesome/free-solid-svg-icons';
-import {
-  validateOnlyString,
-  validateEmail,
-  validatePhoneNumber,
-  validateWeight,
-  validateHeight,
-  validateAge,
-} from '../../components/Validations/Patients/PatientValidation';
+import Select from 'react-select';
+import { faUser,faCake,faPhone,faMapMarkerAlt,faVenusMars,faChevronDown,faWeight,faArrowsAltV,faEnvelope,faUserDoctor,} from '@fortawesome/free-solid-svg-icons';
+import {validateOnlyString,validateEmail,validatePhoneNumber,validateWeight,validateHeight,validateAge,} from '../../components/Validations/Patients/PatientValidation';
 import useAddPatient from '../../hooks/Patients/useAddPatient';
-import { showAlert } from '../../components/Alerts/PatientAlert';
+import useGetDoctors from '../../hooks/Doctors/useGetDoctors';
+import { showAlert, showErrorAlert } from '../../components/Alerts/PatientAlert';
 import { Patient } from '../../interfaces/Patients/Patients';
 
 interface DashboardProps {
@@ -31,8 +16,14 @@ interface DashboardProps {
 }
 
 const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+  const rol = localStorage.getItem('rolID') || 'rolId';
+  const medicoId = localStorage.getItem('userId') || 'Id';
   const navigate = useNavigate();
   const { addPatient, loading, error, success } = useAddPatient();
+  const { doctors, loading: doctorsLoading } = useGetDoctors(Number(rol));
+
+  const [selectedDoctor, setSelectedDoctor] = useState<{ value: number; label: string } | null>(null);
+  const [inputValue, setInputValue] = useState<string>('');
 
   const [formData, setFormData] = useState<Patient>({
     iD_Paciente: 0,
@@ -45,6 +36,7 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     telefono: '',
     domicilio: '',
     correo: '',
+    MedicoID: Number(rol) === 2 ? Number(selectedDoctor?.value) : Number(medicoId),
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -79,7 +71,6 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         : value,
     });
 
-    // Validaciones específicas para cada campo
     const validationError = (() => {
       switch (name) {
         case 'nombre':
@@ -116,7 +107,7 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
       return;
     }
 
-    if (Object.values(formErrors).some((error) => error)) {
+    if (Object.values(formErrors).some((error) => error) || (Number(rol) === 2 && !selectedDoctor)) {
       showAlert(
         'Error',
         'Por favor corrige los errores en el formulario antes de continuar.',
@@ -125,12 +116,46 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
       return;
     }
 
-    await addPatient(formData);
+    try {
+      let formattedData = { ...formData };
+    
+      if (Number(rol) === 2 && selectedDoctor) {
+        formattedData = {
+          ...formattedData,
+          MedicoID: selectedDoctor.value,
+        };
+      } else {
+        formattedData = {
+          ...formattedData,
+          MedicoID: parseInt(medicoId),
+        };
+      }
+    
+      await addPatient(formattedData);
+    } catch (err) {
+      console.error('Error al agregar el paciente', err);
+      showErrorAlert();
+    }
+    
+
   };
 
   if (loading) {
     return <div>Cargando...</div>;
   }
+
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+  };
+
+  const handleRolChange = (selectedOption: any) => {
+    setSelectedDoctor(selectedOption);
+  };
+
+  const options = doctors.map(doctor => ({
+    value: doctor.iD_Medico,
+    label: `${doctor.nombre} ${doctor.apellido}`,
+  }));
 
   return (
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
@@ -248,7 +273,7 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                           className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                           type="number"
                           name="edad"
-                          
+
                           min={0}
                           max={125}
                           placeholder="0"
@@ -407,6 +432,35 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       </div>
                     </div>
                   </div>
+
+                  {rol === '2' && (
+                    <div className="mb-5 flex flex-col gap-5 sm:flex-row">
+                      <div className="w-full sm:w-1/3">
+                        <label
+                          className="mb-3 block text-sm font-medium text-black dark:text-white"
+                          htmlFor="nombrePaciente"
+                        >
+                          Nombre del médico
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-4.5 top-4">
+                            <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                          </span>
+                          <Select
+                            className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                            options={options}
+                            value={selectedDoctor}
+                            onChange={handleRolChange}
+                            onInputChange={handleInputChange}
+                            inputValue={inputValue}
+                            isLoading={doctorsLoading}
+                            placeholder="Buscar médico..."
+                            noOptionsMessage={() => 'No se encontraron opciones'}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex justify-end gap-4.5">
                     <button

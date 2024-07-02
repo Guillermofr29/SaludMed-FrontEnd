@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BreadcrumbPatients from '../../components/Breadcrumbs/BreadcrumbPatient';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faCake, faPhone, faMapMarkerAlt, faTrash, faVenusMars, faChevronDown, faWeightScale, faArrowsUpDown, faEnvelope, } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faCake, faPhone, faMapMarkerAlt, faTrash, faVenusMars, faChevronDown, faWeightScale, faArrowsUpDown, faEnvelope, faUserDoctor, } from '@fortawesome/free-solid-svg-icons';
+import Select from 'react-select';
 import useFetchPatient from '../../hooks/Patients/useFetchPatient';
 import useUpdatePatient from '../../hooks/Patients/useUpdatePatient';
 import useGetPatients from '../../hooks/Patients/useGetPatients';
 import { Patient } from '../../interfaces/Patients/Patients';
+import useGetDoctors from '../../hooks/Doctors/useGetDoctors';
 import { showConfirmationAlert, showSuccessAlert, showErrorAlert, showDeleteConfirmation, showDeleteSuccessAlert, showAlert, } from '../../components/Alerts/PatientAlert';
 import { validateOnlyString, validateEmail, validatePhoneNumber, validateAge, validateHeight, validateWeight } from '../../components/Validations/Patients/PatientValidation';
 
@@ -16,17 +18,19 @@ interface DashboardProps {
 }
 
 const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+  const rol = localStorage.getItem('rolID') || 'rolId';
+  const medicoId = localStorage.getItem('userId') || 'Id';
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
   const patientId = id ? parseInt(id) : undefined;
+  const { doctors, loading: doctorsLoading } = useGetDoctors(Number(rol));
 
   const { patient, loading, error } = useFetchPatient(patientId || 0);
-  const {
-    updatePatient,
-    loading: updating,
-    error: updateError,
-  } = useUpdatePatient();
-  const { deletePatient } = useGetPatients();
+  const {updatePatient,loading: updating,error: updateError} = useUpdatePatient();
+  const { deletePatient } = useGetPatients(Number(medicoId));
+
+  const [selectedDoctor, setSelectedDoctor] = useState<{ value: number; label: string } | null>(null);
+  const [inputValue, setInputValue] = useState<string>('');
 
   const [, setSelectedOption] = useState<string | undefined>(undefined);
 
@@ -41,6 +45,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     telefono: '',
     domicilio: '',
     correo: '',
+    MedicoID: Number(rol) === 2 ? selectedDoctor?.value : Number(medicoId),
   });
 
   useEffect(() => {
@@ -106,7 +111,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
       return;
     }
 
-    if (Object.values(formErrors).some((error) => error)) {
+    if (Object.values(formErrors).some((error) => error) || (Number(rol) === 2 && !selectedDoctor)) {
       showAlert(
         'Error',
         'Por favor corrige los errores en el formulario antes de continuar.',
@@ -119,13 +124,28 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
     if (confirmed && formData) {
       try {
-        await updatePatient(formData);
+        let updatedData = { ...formData };
+    
+        if (Number(rol) === 2 && selectedDoctor) {
+          updatedData = {
+            ...updatedData,
+            MedicoID: selectedDoctor.value,
+          };
+        } else {
+          updatedData = {
+            ...updatedData,
+            MedicoID: parseInt(medicoId),
+          };
+        }
+    
+        await updatePatient(updatedData);
         showSuccessAlert();
       } catch (err) {
         console.error('Error al actualizar el paciente', err);
         showErrorAlert();
       }
     }
+    
   };
 
   const handleDelete = async () => {
@@ -153,6 +173,20 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   if (!patient) {
     return <div>Paciente no encontrado</div>;
   }
+
+  const handleInputChange = (newValue: string) => {
+    setInputValue(newValue);
+  };
+
+  const handleRolChange = (selectedOption: any) => {
+    setSelectedDoctor(selectedOption);
+  };
+
+  const options = doctors.map(doctor => ({
+    value: doctor.iD_Medico,
+    label: `${doctor.nombre} ${doctor.apellido}`,
+  }));
+
   return (
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
       <div className="mx-auto max-w-270">
@@ -259,7 +293,7 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                         htmlFor="edad"
                       >
-                        Edad value= {formData?.edad || 0}
+                        Edad
                       </label>
                       <div className="relative">
                         <span className="absolute left-4.5 top-4">
@@ -426,6 +460,36 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       </div>
                     </div>
                   </div>
+
+                  {rol === '2' && (
+                    <div className="mb-5 flex flex-col gap-5 sm:flex-row">
+                      <div className="w-full sm:w-1/3">
+                        <label
+                          className="mb-3 block text-sm font-medium text-black dark:text-white"
+                          htmlFor="nombrePaciente"
+                        >
+                          Cambiar médico
+                        </label>
+                        <div className="relative">
+                          <span className="absolute left-4.5 top-4">
+                            <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                          </span>
+                          <Select
+                            className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                            options={options}
+                            value={selectedDoctor ? selectedDoctor : { value: formData.MedicoID || 0, label: 'Seleccionar médico' }}
+                            onChange={handleRolChange}
+                            onInputChange={handleInputChange}
+                            inputValue={inputValue}
+                            isLoading={doctorsLoading}
+                            placeholder="Buscar médico..."
+                            noOptionsMessage={() => 'No se encontraron opciones'}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
 
                   <div className="flex justify-end gap-4.5">
                     <button

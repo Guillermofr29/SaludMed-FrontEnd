@@ -1,7 +1,8 @@
 import useLastAppointmentsData from '../../../hooks/Dashboard/useLastAppointmentsData';
 
 const TableLastAppointments = () => {
-  const { lastAppointments, loading, error } = useLastAppointmentsData();
+  const MedicoID = localStorage.getItem('userId') || 'Id';
+  const { lastAppointments, loading, error } = useLastAppointmentsData(Number(MedicoID));
 
   if (loading) {
     return <p>Cargando...</p>;

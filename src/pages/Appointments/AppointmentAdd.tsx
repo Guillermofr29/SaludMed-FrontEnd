@@ -3,29 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import BreadcrumbAppointment from '../../components/Breadcrumbs/BreadcrumbAppointment';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faNoteSticky, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faNoteSticky, faChevronDown, faFilePen, faCalendarDay, faCalendarCheck, faCalendarXmark } from '@fortawesome/free-solid-svg-icons';
 import useAddAppointment from '../../hooks/Appointments/useAddAppointment';
 import { AppointmentAddi } from '../../interfaces/Appointments/AppointmentAdd';
 import { showAlert, showSuccessAlert, showErrorAlert } from '../../components/Alerts/AppointmentAlert';
 import { validateOnlyString } from '../../components/Validations/Patients/PatientValidation';
 import useGetPatients from '../../hooks/Patients/useGetPatients';
-import Select from 'react-select'; // Importa el componente de autocompletado que uses
+import Select from 'react-select';
 
 interface DashboardProps {
     setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
 const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+    
     const navigate = useNavigate();
-    const { patients, loading: patientsLoading } = useGetPatients();
+    const medicoId = localStorage.getItem('userId') || 'Id';
+    const medicoNombre = localStorage.getItem('userName') || 'Nombre';
+    // const rol = localStorage.getItem('rolID') || 'rolId';
+    const { patients, loading: patientsLoading } = useGetPatients(Number(medicoId));
     const { addAppointment, loading, error, success } = useAddAppointment();
+
     const [formData, setFormData] = useState<AppointmentAddi>({
         PacienteID: 0,
-        MedicoID: 0,
+        MedicoID: parseInt(medicoId),
         fecha: '',
         hora: '',
         motivo: '',
-        estatus: '',
+        estatus: 'Pendiente',
         notas: '',
     });
     const [motivoError, setMotivoError] = useState<string | null>(null);
@@ -74,6 +79,8 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                 ...formData,
                 PacienteID: selectedPatient.value,
                 motivo: formatMotivo(formData.motivo),
+                MedicoID: parseInt(medicoId),
+                estatus: 'Pendiente',
             };
             await addAppointment(formattedData);
         } catch (err) {
@@ -122,7 +129,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     <FontAwesomeIcon icon={faUser} opacity="0.8" />
                                                 </span>
                                                 <Select
-                                                    className="w-full"
+                                                    className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                                                     options={options}
                                                     value={selectedPatient}
                                                     onChange={handlePatientChange}
@@ -146,24 +153,14 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 <span className="absolute left-4.5 top-4">
                                                     <FontAwesomeIcon icon={faUser} opacity="0.8" />
                                                 </span>
-                                                {/* Aquí deberías agregar un selector similar para el médico */}
-                                                <select
-                                                    className={
-                                                        'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'
-                                                    }
-                                                    name="MedicoID"
-                                                    // value={formData.MedicoID}
-                                                    value={1}
+                                                <input
+                                                    className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
                                                     onChange={handleChange}
+                                                    name='nombreMedico'
+                                                    value={medicoNombre}
+                                                    disabled
                                                 >
-                                                    <option disabled>
-                                                        Seleccionar Médico
-                                                    </option>
-                                                    <option value={1}>
-                                                        Joe Doe
-                                                    </option>
-                                                    {/* Opciones de médicos */}
-                                                </select>
+                                                </input>
                                             </div>
                                         </div>
 
@@ -214,7 +211,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">
-                                                    <FontAwesomeIcon icon={faNoteSticky} opacity="0.8" />
+                                                    <FontAwesomeIcon icon={faFilePen} opacity="0.8" />
                                                 </span>
                                                 <input
                                                     className={`w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${motivoError ? 'border-red-500' : ''}`}
@@ -235,13 +232,21 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </label>
                                             <div className="relative z-20 bg-white dark:bg-form-input">
                                                 <span className="absolute top-1/2 left-4 z-30 -translate-y-1/2">
-                                                    <FontAwesomeIcon icon={faNoteSticky} opacity="0.8" />
+                                                    {formData?.estatus === 'Pendiente' && (
+                                                        <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
+                                                    )}
+                                                    {formData?.estatus === 'Terminada' && (
+                                                        <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
+                                                    )}
+                                                    {formData?.estatus === 'Cancelada' && (
+                                                        <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
+                                                    )}
                                                 </span>
                                                 <select
                                                     name="estatus"
                                                     value={formData.estatus}
                                                     onChange={handleChange}
-                                                    className={'relative z-20 w-full appearance-none rounded border border-stroke py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input'}
+                                                    className="relative z-20 w-full appearance-none rounded border border-stroke py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input"
                                                     disabled
                                                 >
                                                     <option value="Pendiente">Pendiente</option>
