@@ -39,10 +39,19 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const handleUnload = () => {
-      //localStorage.removeItem('isAuthenticated');
-    };
+    const authState = localStorage.getItem('isAuthenticated');
+    const sessionCheck = sessionStorage.getItem('sessionCheck');
 
+    if (authState === 'true' && !sessionCheck) {
+      handleLogout();
+    } else if (authState === 'true') {
+      setIsAuthenticated(true);
+    }
+
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  useEffect(() => {
     const handleUserActivity = () => {
       clearTimeout(inactivityTimeout);
       inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
@@ -50,13 +59,11 @@ function App() {
 
     let inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
 
-    window.addEventListener('beforeunload', handleUnload);
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keypress', handleUserActivity);
     window.addEventListener('scroll', handleUserActivity);
 
     return () => {
-      window.removeEventListener('beforeunload', handleUnload);
       window.removeEventListener('mousemove', handleUserActivity);
       window.removeEventListener('keypress', handleUserActivity);
       window.removeEventListener('scroll', handleUserActivity);
@@ -66,11 +73,17 @@ function App() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userSpecialty');
+    localStorage.removeItem('rolID');
+    sessionStorage.removeItem('sessionCheck');
   };
 
   const handleLogin = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
+    sessionStorage.setItem('sessionCheck', 'true');
   };
 
   return loading ? (
