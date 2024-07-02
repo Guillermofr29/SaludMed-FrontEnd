@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserDoctor, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faUserDoctor, faLock, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
 import useAuthentication from '../hooks/Login/useLogin';
 
 interface LoginProps {
@@ -13,6 +13,12 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const { error, loading, handleLogin } = useAuthentication({
     setIsAuthenticated,
   });
+
+  const [mostrarContraseña, setMostrarContraseña] = useState(false);
+
+  const toggleMostrarContraseña = () => {
+    setMostrarContraseña(!mostrarContraseña);
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -63,10 +69,7 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
               </div>
             </div>
             <div className="mb-6">
-              <label
-                htmlFor="contraseña"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="contraseña" className="block text-sm font-medium text-gray-700">
                 Contraseña
               </label>
               <div className="relative">
@@ -74,7 +77,7 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
                   <FontAwesomeIcon icon={faLock} opacity="0.8" />
                 </span>
                 <input
-                  type="password"
+                  type={mostrarContraseña ? 'text' : 'password'}
                   id="contraseña"
                   value={contraseña}
                   onChange={(e) => setContraseña(e.target.value)}
@@ -82,6 +85,13 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
                   placeholder="Password"
                   autoComplete="current-password"
                 />
+                <button
+                  type="button"
+                  className="absolute right-3 top-2.5"
+                  onClick={toggleMostrarContraseña}
+                >
+                  <FontAwesomeIcon icon={mostrarContraseña ? faEyeSlash : faEye} opacity="0.8" />
+                </button>
               </div>
               {error && (
                 <p className="mt-1.5 text-xs text-center font-bold text-red-500">

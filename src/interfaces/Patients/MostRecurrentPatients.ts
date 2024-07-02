@@ -1,5 +1,5 @@
 export type MostRecurrentPatients = {
-    NoPaciente: string;
-    Paciente: string;
-    NoVisitas: number;
+    iD_Paciente: number;
+    nombrePaciente: string;
+    numeroDeCitas: number;
 };

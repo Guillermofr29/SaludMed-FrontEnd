@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosConfig';
 import { Patient } from '../../interfaces/Patients/Patients';
 
-const useGetPatients = () => {
+const useGetPatients = (medicoID: number) => {
     const [patients, setPatients] = useState<Patient[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -10,7 +10,7 @@ const useGetPatients = () => {
     useEffect(() => {
         const fetchPatients = async () => {
             try {
-                const response = await axiosInstance.get('Paciente');
+                const response = await axiosInstance.get(`Paciente?medicoID=${medicoID}`);
                 setPatients(response.data.result);
             } catch (err) {
                 setError('Error al obtener los pacientes');
@@ -20,7 +20,7 @@ const useGetPatients = () => {
         };
 
         fetchPatients();
-    }, []);
+    }, [medicoID]);
 
     const deletePatient = async (id: number) => {
         try {

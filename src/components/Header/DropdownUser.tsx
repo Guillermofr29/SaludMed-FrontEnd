@@ -20,6 +20,9 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
 
+  const nombre = localStorage.getItem('userName') || 'Nombre';
+  const especialidad = localStorage.getItem('userSpecialty') || 'Especialidad';
+
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -59,9 +62,9 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Joe Doe
+            {nombre}
           </span>
-          <span className="block text-xs">Doctor</span>
+          <span className="block text-xs">{especialidad}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full overflow-hidden">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faMagnifyingGlass, faCaretLeft, faCaretRight, faTrash, faCalendarPlus, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faPenToSquare, faMagnifyingGlass, faCaretLeft, faCaretRight, faTrash, faCalendarPlus, faFilter, faCalendarDay, faCalendarCheck, faCalendarXmark } from '@fortawesome/free-solid-svg-icons';
 import { Appointments } from '../../../interfaces/Appointments/Appointments';
 import useGetAppointments from '../../../hooks/Appointments/useGetAppointments';
 import useDeleteAppointment from '../../../hooks/Appointments/useDeleteAppointments';
@@ -11,7 +11,8 @@ const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
 const AppointmentsTable: React.FC = () => {
-    const { appointments: initialAppointments, loading, error } = useGetAppointments();
+    const MedicoID = localStorage.getItem('userId') || 'Id';
+    const { appointments: initialAppointments, loading, error } = useGetAppointments(Number(MedicoID));
     const { deleteAppointment, error: deleteError } = useDeleteAppointment();
     const [appointments, setAppointments] = useState<Appointments[]>(initialAppointments);
     const [searchTerm, setSearchTerm] = useState('');
@@ -262,6 +263,9 @@ const AppointmentsTable: React.FC = () => {
                                 Paciente
                             </th>
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Médico
+                            </th>
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Fecha
                             </th>
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -291,19 +295,35 @@ const AppointmentsTable: React.FC = () => {
                                     {appointment.nombrePaciente}
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {appointment.nombreMedico}
+                                </td>
+                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {appointment.fecha}
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {appointment.hora}
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500">
                                     {appointment.motivo}
                                 </td>
                                 <td className="px-4 py-4 whitespace-normal text-sm text-gray-500">
                                     {appointment.notas}
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <p className={`${getStatusClassName(appointment.estatus)}`}>{appointment.estatus}</p>
+                                    <p className={`${getStatusClassName(appointment.estatus)}`}>
+                                    <span className="pr-1">
+                                        {appointment.estatus === 'Pendiente' && (
+                                            <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
+                                        )}
+                                        {appointment.estatus === 'Terminada' && (
+                                            <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
+                                        )}
+                                        {appointment.estatus === 'Cancelada' && (
+                                            <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
+                                        )}
+                                    </span>
+                                        {appointment.estatus}
+                                    </p>
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button className="text-meta-5" onClick={() => appointment.iD_Cita && handleEditAppointment(appointment.iD_Cita)}>

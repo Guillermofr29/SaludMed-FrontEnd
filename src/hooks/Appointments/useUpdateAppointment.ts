@@ -12,7 +12,7 @@ const useUpdateAppointment = () => {
             const response = await axiosInstance.put(`Cita/${appointment.iD_Cita}`, appointment);
             return response.data;
         } catch (err) {
-            setError('Error al actualizar los datos de la cita');
+            setError('Error al actualizar los datos de la citaxd');
             throw err;
         } finally {
             setLoading(false);

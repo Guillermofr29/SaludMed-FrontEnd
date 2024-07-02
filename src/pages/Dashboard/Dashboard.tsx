@@ -1,5 +1,4 @@
 import React from 'react';
-import Loader from '../../common/Loader/index';
 import CardDashboard from '../../components/Cards/Dashboard/CardDashboard';
 import MostCommonDiseases from '../../components/Charts/MostCommonDiseases';
 import QuantityBySex from '../../components/Charts/QuantityBySex';
@@ -7,34 +6,31 @@ import TableLastAppointments from '../../components/Tables/Dashboard/TableLastAp
 import TableMostPrescripMed from '../../components/Tables/Dashboard/TableMostPrescripMed';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUserInjured,
-  faCalendar,
-  faCalendarDay,
-} from '@fortawesome/free-solid-svg-icons';
+import {faUserInjured,faCalendar,faCalendarDay} from '@fortawesome/free-solid-svg-icons';
 import useDashboardData from '../../hooks/Dashboard/useDashboardData';
-import Error from '../Error';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
-  const { data, loading, error } = useDashboardData();
+  const MedicoID = localStorage.getItem('userId') || 'Id';
+  const nombreDoctor = localStorage.getItem('userName') || 'Nombre';
+  const { data, loading, error } = useDashboardData(Number(MedicoID));
 
   if (loading) {
-    return <Loader />;
+    return <div>Cargando...</div>;
   }
 
   if (error) {
-    return <Error />;
+    return <div>Error al cargar los datos</div>;
   }
 
   return (
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-          Bienvenido, Dr. Joe Doe!
+          Bienvenido, Dr. {nombreDoctor}!
         </h1>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Este es tu dashboard médico. Aquí puedes encontrar información y

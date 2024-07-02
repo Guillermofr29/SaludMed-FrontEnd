@@ -6,7 +6,7 @@ import PageTitle from './components/PageTitle';
 
 import Login from './pages/Login';
 
-const INACTIVITY_TIME = 300000; //Esto es 5 minutos
+const INACTIVITY_TIME = 960000; //Esto es 5 minutos
 //60000 1 minuto
 
 import NotFound from './pages/NotFound';

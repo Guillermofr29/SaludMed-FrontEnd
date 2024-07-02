@@ -3,35 +3,62 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BreadcrumbAppointment from '../../components/Breadcrumbs/BreadcrumbAppointment';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faNoteSticky, faFilePen, faChevronDown, faClipboardCheck, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faNoteSticky, faFilePen, faChevronDown, faTrash, faCalendarDay, faCalendarCheck, faCalendarXmark, faUserDoctor } from '@fortawesome/free-solid-svg-icons';
 import useGetAppointmentById from '../../hooks/Appointments/useGetAppointmentById';
 import useUpdateAppointment from '../../hooks/Appointments/useUpdateAppointment';
 import useDeleteAppointment from '../../hooks/Appointments/useDeleteAppointments';
 import { Appointments } from '../../interfaces/Appointments/Appointments';
 import { showConfirmationAlert, showSuccessAlert, showErrorAlert, showAlert, showDeleteConfirmation, showDeleteSuccessAlert } from '../../components/Alerts/AppointmentAlert';
 import { validateOnlyString } from '../../components/Validations/Patients/PatientValidation';
+import Select from 'react-select';
+import useGetDoctors from '../../hooks/Doctors/useGetDoctors';
 
 interface DashboardProps {
     setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
 const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+    const rol = localStorage.getItem('rolID') || 'rolId';
+    const medicoId = localStorage.getItem('userId') || 'Id';
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const appointmentId = id ? parseInt(id) : undefined;
+    const { doctors, loading: doctorsLoading } = useGetDoctors(Number(rol));
 
     const { appointment, loading, error } = useGetAppointmentById(appointmentId || 0);
     const { updateAppointment, loading: updating, error: updateError } = useUpdateAppointment();
     const { deleteAppointment, error: deleteError } = useDeleteAppointment();
-
-    const [formData, setFormData] = useState<Appointments | null>(null);
     const [motivoError, setMotivoError] = useState<string | null>(null);
+
+    const [selectedDoctor, setSelectedDoctor] = useState<{ value: number; label: string } | null>(null);
+    const [inputValue, setInputValue] = useState<string>('');
+
+    // const [formData, setFormData] = useState<Appointments | null>(null);
+    const [formData, setFormData] = useState<Appointments>({
+        iD_Cita: 0,
+        PacienteID: 0,
+        MedicoID: Number(rol) === 2 ? selectedDoctor?.value : Number(medicoId),
+        fecha: '',
+        hora: '',
+        motivo: '',
+        notas: '',
+        estatus: '',
+        nombrePaciente: '', // Proporcionar un valor inicial
+        nombreMedico: '',
+    });
 
     useEffect(() => {
         if (appointment) {
             setFormData(appointment);
+            if (Number(rol) === 2) {
+                const doctor = doctors.find(doc => doc.iD_Medico === appointment.MedicoID);
+                if (doctor) {
+                    setSelectedDoctor({ value: doctor.iD_Medico, label: `${doctor.nombre} ${doctor.apellido}` });
+                }
+            }
         }
-    }, [appointment]);
+    }, [appointment, doctors, rol]);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -47,14 +74,14 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         }
     };
 
-    const formatMotivo = (motivo:string): string => {
+    const formatMotivo = (motivo: string): string => {
         return motivo.trim().toLowerCase().replace(/^\w/, (c: string) => c.toUpperCase());
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (motivoError) {
+        if (motivoError || (Number(rol) === 2 && !selectedDoctor)) {
             showAlert('Error', 'Por favor, corrija los errores en el formulario antes de continuar.', 'error');
             return;
         }
@@ -63,17 +90,47 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
         if (confirmed && formData) {
             try {
-                const formattedData = {
-                    ...formData,
-                    motivo: formatMotivo(formData.motivo),
-                };
-                await updateAppointment(formattedData);
+                let updatedAppointment = { ...formData };
+
+                if (Number(rol) === 2 && selectedDoctor) {
+                    updatedAppointment = {
+                        ...updatedAppointment,
+                        motivo: formatMotivo(formData.motivo),
+                        MedicoID: selectedDoctor.value,
+                    };
+                } else {
+                    updatedAppointment = {
+                        ...updatedAppointment,
+                        motivo: formatMotivo(formData.motivo),
+                        MedicoID: parseInt(medicoId),
+                    };
+                }
+
+                await updateAppointment(updatedAppointment);
                 showSuccessAlert();
             } catch (err) {
                 console.error('Error al actualizar la cita', err);
                 showErrorAlert();
             }
         }
+
+
+        // const confirmed = await showConfirmationAlert();
+
+        // if (confirmed && formData) {
+        //     try {
+        //         const formattedData = {
+        //             ...formData,
+        //             motivo: formatMotivo(formData.motivo),
+        //             MedicoID: Number(rol) === 2 ? selectedDoctor?.value : Number(medicoId),
+        //         };
+        //         await updateAppointment(formattedData);
+        //         showSuccessAlert();
+        //     } catch (err) {
+        //         console.error('Error al actualizar la cita', err);
+        //         showErrorAlert();
+        //     }
+        // }
     };
 
     const handleDelete = async () => {
@@ -101,6 +158,19 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     if (!appointment) {
         return <div>Cita no encontrada</div>;
     }
+
+    const handleInputChange = (newValue: string) => {
+        setInputValue(newValue);
+    };
+
+    const handleRolChange = (selectedOption: any) => {
+        setSelectedDoctor(selectedOption);
+    };
+
+    const options = doctors.map(doctor => ({
+        value: doctor.iD_Medico,
+        label: `${doctor.nombre} ${doctor.apellido}`,
+    }));
 
     return (
         <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
@@ -137,25 +207,54 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </div>
                                         </div>
 
-                                        <div className="w-full sm:w-1/2">
-                                            <label
-                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                                htmlFor="nombreMedico"
-                                            >
-                                                Nombre del Médico
-                                            </label>
-                                            <div className="relative">
-                                                <span className="absolute left-4.5 top-4">
-                                                    <FontAwesomeIcon icon={faUser} opacity="0.8" />
-                                                </span>
-                                                <input
-                                                    className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 cursor-not-allowed focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
-                                                    type="text"
-                                                    value={formData?.nombreMedico || ''}
-                                                    disabled
-                                                />
+                                        {rol === '2' && (
+                                            <div className="w-full sm:w-1/2">
+                                                <label
+                                                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                    htmlFor="nombrePaciente"
+                                                >
+                                                    Cambiar médico
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-4.5 top-4">
+                                                        <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                                                    </span>
+                                                    <Select
+                                                        className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                        options={options}
+                                                        value={selectedDoctor ? selectedDoctor : { value: formData?.MedicoID || 0, label: 'Seleccionar médico' }}
+                                                        onChange={handleRolChange}
+                                                        onInputChange={handleInputChange}
+                                                        inputValue={inputValue}
+                                                        isLoading={doctorsLoading}
+                                                        placeholder="Buscar médico..."
+                                                        noOptionsMessage={() => 'No se encontraron opciones'}
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
+                                            // : (
+                                            //     <div className="w-full sm:w-1/2">
+                                            //         <label
+                                            //             className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                            //             htmlFor="nombreMedico"
+                                            //         >
+                                            //             Nombre del Médico
+                                            //         </label>
+                                            //         <div className="relative">
+                                            //             <span className="absolute left-4.5 top-4">
+                                            //                 <FontAwesomeIcon icon={faUser} opacity="0.8" />
+                                            //             </span>
+                                            //             <input
+                                            //                 className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 cursor-not-allowed focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
+                                            //                 type="text"
+                                            //                 value={formData.nombreMedico}
+                                            //                 disabled
+                                            //             />
+                                            //         </div>
+                                            //     </div>
+                                            // )
+                                        }
 
                                         <div className="w-full sm:w-1/2">
                                             <label
@@ -226,7 +325,15 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </label>
                                             <div className="relative z-20 bg-white dark:bg-form-input">
                                                 <span className="absolute top-1/2 left-4 z-30 -translate-y-1/2">
-                                                    <FontAwesomeIcon icon={faClipboardCheck} opacity="0.8" />
+                                                    {formData?.estatus === 'Pendiente' && (
+                                                        <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
+                                                    )}
+                                                    {formData?.estatus === 'Terminada' && (
+                                                        <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
+                                                    )}
+                                                    {formData?.estatus === 'Cancelada' && (
+                                                        <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
+                                                    )}
                                                 </span>
                                                 <select
                                                     name="estatus"
