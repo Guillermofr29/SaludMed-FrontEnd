@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserDoctor, faLock, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUserDoctor,
+  faLock,
+  faEyeSlash,
+  faEye,
+} from '@fortawesome/free-solid-svg-icons';
 import useAuthentication from '../hooks/Login/useLogin';
 
 interface LoginProps {
@@ -69,7 +74,10 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
               </div>
             </div>
             <div className="mb-6">
-              <label htmlFor="contraseña" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="contraseña"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña
               </label>
               <div className="relative">
@@ -90,7 +98,10 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
                   className="absolute right-3 top-2.5"
                   onClick={toggleMostrarContraseña}
                 >
-                  <FontAwesomeIcon icon={mostrarContraseña ? faEyeSlash : faEye} opacity="0.8" />
+                  <FontAwesomeIcon
+                    icon={mostrarContraseña ? faEyeSlash : faEye}
+                    opacity="0.8"
+                  />
                 </button>
               </div>
               {error && (

@@ -17,7 +17,7 @@ import Patients from './pages/Patients/Patients';
 import PatientEdit from './pages/Patients/PatientEdit';
 import PatientAdd from './pages/Patients/PatientAdd';
 
-import Citas from './pages/Appointments/Appointments'
+import Citas from './pages/Appointments/Appointments';
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AppointmentAdd from './pages/Appointments/AppointmentAdd';
 
@@ -40,7 +40,7 @@ function App() {
 
   useEffect(() => {
     const handleUnload = () => {
-      localStorage.removeItem('isAuthenticated');
+      //localStorage.removeItem('isAuthenticated');
     };
 
     const handleUserActivity = () => {

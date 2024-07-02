@@ -49,6 +49,11 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userSpecialty');
+    localStorage.removeItem('rolID');
     navigate('/login');
   };
 
