@@ -1,78 +1,54 @@
-import { MostRecurrentPatients } from '../../../interfaces/Patients/MostRecurrentPatients';
-
-const MostRecurrentPatientsData: MostRecurrentPatients[] = [
-    {
-        NoPaciente: 'PAC001',
-        Paciente: 'Joe Doe',
-        NoVisitas: 12,
-    },
-    {
-        NoPaciente: 'PAC002',
-        Paciente: 'Joe Doe',
-        NoVisitas: 12,
-    },
-    {
-        NoPaciente: 'PAC003',
-        Paciente: 'Joe Doe',
-        NoVisitas: 12,
-    },
-    {
-        NoPaciente: 'PAC004',
-        Paciente: 'Joe Doe',
-        NoVisitas: 12,
-    }
-];
+import useMostRecurrentPatients from "../../../hooks/Patients/useMostRecurrentPatients";
 
 const TableMostRecurrentPatients = () => {
+    const MedicoID = localStorage.getItem('userId') || 'Id';
+    const rolID = localStorage.getItem('rolID') || 'rolID';
+
+    const { recurrentPatients, loading, error } = useMostRecurrentPatients(Number(MedicoID), Number(rolID));
+
+    if (loading) {
+        return <p>Cargando...</p>;
+    }
+
+    if (error) {
+        return <p>{error}</p>;
+    }
+
     return (
-        <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
+        <div className="overflow-x-auto rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
             <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
-                Pacientes mas recurrentes
+                Historial de citas
             </h4>
-
-            <div className="flex flex-col">
-                <div className="grid grid-cols-3 rounded-sm bg-gray-2 dark:bg-meta-4 sm:grid-cols-3">
-                    <div className="p-2.5 text-center xl:p-5">
-                        <h5 className="text-sm font-medium xsm:text-base">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             No.Paciente
-                        </h5>
-                    </div>
-                    <div className="p-2.5 text-center xl:p-5">
-                        <h5 className="text-sm font-medium xsm:text-base">
+                        </th>
+                        <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Nombre
-                        </h5>
-                    </div>
-                    <div className="p-2.5 text-center xl:p-5">
-                        <h5 className="text-sm font-medium xsm:text-base">
+                        </th>
+                        <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                             No. Visitas
-                        </h5>
-                    </div>
-                </div>
-
-                {MostRecurrentPatientsData.map((MostRecurrentPatients, key) => (
-                    <div
-                        className={`grid grid-cols-3 sm:grid-cols-3 ${key === MostRecurrentPatientsData.length - 1
-                                ? ''
-                                : 'border-b border-stroke dark:border-strokedark'
-                            }`}
-                        key={key}
-                    >
-                        <div className="flex items-center justify-center p-2.5 xl:p-5">
-                            <p className="text-black dark:text-white">
-                                {MostRecurrentPatients.NoPaciente}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center justify-center p-2.5 xl:p-5">
-                            <p className="text-black dark:text-white">{MostRecurrentPatients.Paciente}</p>
-                        </div>
-
-                        <div className="flex items-center justify-center p-2.5 xl:p-5">
-                            <p className="text-black dark:text-white">{MostRecurrentPatients.NoVisitas}</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
+                    {recurrentPatients.map((reacApp) => (
+                        <tr key={reacApp.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {reacApp.iD_Paciente}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {reacApp.nombrePaciente}
+                            </td>
+                            <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {reacApp.numeroDeCitas}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
         </div>
     );
 };

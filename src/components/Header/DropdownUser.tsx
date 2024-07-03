@@ -1,17 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faRightFromBracket, faChevronDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUser,
+  faRightFromBracket,
+  faChevronDown,
+} from '@fortawesome/free-solid-svg-icons';
 
 import UserOne from '../../images/user/user-1.jpg';
 
-const DropdownUser = () => {
+interface DropdownUserProps {
+  setIsAuthenticated: (isAuthenticated: boolean) => void;
+}
+
+const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
 
-  // close on click outside
+  const nombre = localStorage.getItem('userName') || 'Nombre';
+  const especialidad = localStorage.getItem('userSpecialty') || 'Especialidad';
+
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -27,7 +38,6 @@ const DropdownUser = () => {
     return () => document.removeEventListener('click', clickHandler);
   });
 
-  // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }: KeyboardEvent) => {
       if (!dropdownOpen || keyCode !== 27) return;
@@ -36,6 +46,17 @@ const DropdownUser = () => {
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
   });
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userSpecialty');
+    localStorage.removeItem('rolID');
+    sessionStorage.removeItem('sessionCheck');
+    navigate('/login');
+  };
 
   return (
     <div className="relative">
@@ -47,19 +68,22 @@ const DropdownUser = () => {
       >
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-black dark:text-white">
-            Joe Doe
+            {nombre}
           </span>
-          <span className="block text-xs">Doctor</span>
+          <span className="block text-xs">{especialidad}</span>
         </span>
 
         <span className="h-12 w-12 rounded-full overflow-hidden">
-          <img src={UserOne} alt="User" className="h-full w-full object-cover"/>
+          <img
+            src={UserOne}
+            alt="User"
+            className="h-full w-full object-cover"
+          />
         </span>
 
-        <FontAwesomeIcon icon={faChevronDown}/>
+        <FontAwesomeIcon icon={faChevronDown} />
       </Link>
 
-      {/* <!-- Dropdown Start --> */}
       <div
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
@@ -79,12 +103,14 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3.5 px-6 py-4 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
+        >
           Log Out
-        <FontAwesomeIcon icon={faRightFromBracket} />
+          <FontAwesomeIcon icon={faRightFromBracket} />
         </button>
       </div>
-      {/* <!-- Dropdown End --> */}
     </div>
   );
 };

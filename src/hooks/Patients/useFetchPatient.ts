@@ -1,12 +1,11 @@
-// useFetchPatient.tsx
 import { useState, useEffect } from 'react';
-import { Patient } from '../../interfaces/Patients/Patients'; // Importa la interfaz
+import { Patient } from '../../interfaces/Patients/Patients';
 import axiosInstance from '../../api/axiosConfig';
 
 const useFetchPatient = (patientId: number) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [patient, setPatient] = useState<Patient | null>(null); // Usa la interfaz Patient
+    const [patient, setPatient] = useState<Patient | null>(null);
 
     useEffect(() => {
         const fetchPatient = async () => {

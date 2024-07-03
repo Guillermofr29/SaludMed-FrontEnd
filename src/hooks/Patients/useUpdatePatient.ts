@@ -10,7 +10,7 @@ const useUpdatePatient = () => {
         setLoading(true);
         try {
             const response = await axiosInstance.put(`Paciente/${patient.iD_Paciente}`, patient);
-            return response.data; // Puedes ajustar esto según lo que tu API devuelva
+            return response.data;
         } catch (err) {
             setError('Error al actualizar el paciente');
             throw err;
