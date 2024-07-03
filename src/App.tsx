@@ -52,12 +52,14 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let inactivityTimeout: NodeJS.Timeout;
+
     const handleUserActivity = () => {
       clearTimeout(inactivityTimeout);
       inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
     };
 
-    let inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
+    handleUserActivity();
 
     window.addEventListener('mousemove', handleUserActivity);
     window.addEventListener('keypress', handleUserActivity);
