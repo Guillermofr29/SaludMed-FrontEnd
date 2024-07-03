@@ -1,6 +1,7 @@
 import React from 'react';
 import DropdownUser from './DropdownUser';
 import DarkModeSwitcher from './DarkModeSwitcher';
+import WeatherApp from '../WeatherApp/Weather';
 
 interface HeaderProps {
   sidebarOpen: boolean;
@@ -65,6 +66,7 @@ const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center gap-3 2xsm:gap-7">
           <ul className="flex items-center gap-2 2xsm:gap-4">
+            <WeatherApp />
             <DarkModeSwitcher />
             <DropdownUser setIsAuthenticated={setIsAuthenticated} />
           </ul>
