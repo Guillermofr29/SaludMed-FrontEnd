@@ -22,7 +22,7 @@ const useMedicamentosMasRecetados = () => {
           console.log('Error en la respuesta de la API:', response.data.message);
         }
       } catch (error) {
-        setError('Error al obtener medicamentos');
+        setError('Error al obtener medicamentos (falta el apartado de recetas)');
       } finally{
         setLoading(false);
       }

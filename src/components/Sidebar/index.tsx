@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import Logo from '../../images/logo/logoWhite.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGaugeSimpleHigh, faUserInjured, faCalendar, faFileWaveform, faUserDoctor, faPills } from '@fortawesome/free-solid-svg-icons';
+import { faGaugeSimpleHigh, faUserInjured, faCalendar, faFileWaveform, faUserDoctor, faPills, faArrowLeft, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -93,7 +93,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
       </div>
       {/* <!-- SIDEBAR HEADER --> */}
 
-      <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear">
+      <div className="no-scrollbar flex flex-col overflow-y-auto duration-300 ease-linear flex-grow">
         {/* <!-- Sidebar Menu --> */}
         <nav className="mt-5 py-4 lg:mt-9">
           <div>
@@ -103,7 +103,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/"
-                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${(pathname === '/' || pathname.includes('dashboard')) &&
+                  className={`group relative text-xl flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${(pathname === '/' || pathname.includes('dashboard')) &&
                     'bg-hoverBlue border-r-4 border-borderBlue'
                     }`}
                 >
@@ -144,7 +144,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/pacientes"
-                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hovreBlue ${pathname.includes('pacientes') &&
+                  className={`group relative text-xl flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hovreBlue ${pathname.includes('pacientes') &&
                     'bg-hoverBlue border-r-4 border-borderBlue'
                     }`}
                 >
@@ -157,7 +157,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/citas"
-                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${pathname.includes('citas') &&
+                  className={`group relative text-xl flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${pathname.includes('citas') &&
                     'bg-hoverBlue border-r-4 border-borderBlue'
                     }`}
                 >
@@ -170,7 +170,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
               <li>
                 <NavLink
                   to="/recetas"
-                  className={`group relative flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${pathname.includes('tables') &&
+                  className={`group relative text-xl flex items-center gap-2.5 rounded-sm px-4 py-2 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-hoverBlue ${pathname.includes('recetas') &&
                     'bg-hoverBlue border-r-4 border-borderBlue'
                     }`}
                 >
@@ -182,6 +182,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
           </div>
         </nav>
         {/* <!-- Sidebar Menu --> */}
+        <div className='mt-auto px-10 m-6 text-center'>
+          <button
+            className="rounded-10 border border border-stroke mx-6 py-2 px-4 font-medium text-white hover:shadow-1 dark:text-white dark:border-gray-500"
+            type="button"
+          // onClick={() => navigate(`/pacientes/editar-paciente/${patientId}`)}
+          >
+            Logout
+            <FontAwesomeIcon icon={faRightFromBracket} className="ml-2 mt-1" />
+          </button>
+        </div>
       </div>
     </aside>
   );

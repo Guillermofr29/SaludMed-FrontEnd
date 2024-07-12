@@ -10,8 +10,9 @@ const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
 const PatientTable: React.FC = () => {
-    const MedicoID = localStorage.getItem('userId') || 'Id';
-    const { patients: initialPatients, loading, error, deletePatient } = useGetPatients(Number(MedicoID));
+    // const rol = localStorage.getItem('rolID') || 'rolId';
+    // const MedicoID = localStorage.getItem('userId') || 'Id';
+    const { patients: initialPatients, loading, error, deletePatient } = useGetPatients();
     const [patients, setPatients] = useState<Patient[]>(initialPatients);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
@@ -175,9 +176,9 @@ const PatientTable: React.FC = () => {
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Nombre
                             </th>
-                            {/* <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Médico
-                            </th> */}
+                            </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Sexo
                             </th>
@@ -194,9 +195,6 @@ const PatientTable: React.FC = () => {
                                 Teléfono
                             </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Correo
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Acciones
                             </th>
                         </tr>
@@ -204,15 +202,12 @@ const PatientTable: React.FC = () => {
                     <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
                         {currentPatients.map((patient) => (
                             <tr key={patient.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.iD_Paciente}
-                                </td> */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.nombre} {patient.apellido}
                                 </td>
-                                {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.nombreMedico}
-                                </td> */}
+                                </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.sexo}
                                 </td>
@@ -227,9 +222,6 @@ const PatientTable: React.FC = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {patient.telefono}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.correo}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button className="text-meta-5" onClick={() => handleEditPatient(patient.iD_Paciente)}>

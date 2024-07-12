@@ -20,10 +20,10 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   const medicoId = localStorage.getItem('userId') || 'Id';
   const navigate = useNavigate();
   const { addPatient, loading, error, success } = useAddPatient();
-  const { doctors, loading: doctorsLoading } = useGetDoctors(Number(rol));
+  const { doctors, loading: doctorsLoading } = useGetDoctors();
 
   const [selectedDoctor, setSelectedDoctor] = useState<{ value: number; label: string } | null>(null);
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValueDoc, setInputValue] = useState<string>('');
 
   const [formData, setFormData] = useState<Patient>({
     iD_Paciente: 0,
@@ -36,7 +36,7 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     telefono: '',
     domicilio: '',
     correo: '',
-    MedicoID: Number(rol) === 2 ? Number(selectedDoctor?.value) : Number(medicoId),
+    medicoID: Number(rol) === 2 ? Number(selectedDoctor?.value) : Number(medicoId),
   });
 
   const [formErrors, setFormErrors] = useState({
@@ -122,12 +122,12 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
       if (Number(rol) === 2 && selectedDoctor) {
         formattedData = {
           ...formattedData,
-          MedicoID: selectedDoctor.value,
+          medicoID: selectedDoctor.value,
         };
       } else {
         formattedData = {
           ...formattedData,
-          MedicoID: parseInt(medicoId),
+          medicoID: parseInt(medicoId),
         };
       }
     
@@ -144,11 +144,11 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     return <div>Cargando...</div>;
   }
 
-  const handleInputChange = (newValue: string) => {
+  const handleInputDocChange = (newValue: string) => {
     setInputValue(newValue);
   };
 
-  const handleRolChange = (selectedOption: any) => {
+  const handleDoctorChange = (selectedOption: any) => {
     setSelectedDoctor(selectedOption);
   };
 
@@ -450,9 +450,9 @@ const PatientAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                             className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
                             options={options}
                             value={selectedDoctor}
-                            onChange={handleRolChange}
-                            onInputChange={handleInputChange}
-                            inputValue={inputValue}
+                            onChange={handleDoctorChange}
+                            onInputChange={handleInputDocChange}
+                            inputValue={inputValueDoc}
                             isLoading={doctorsLoading}
                             placeholder="Buscar médico..."
                             noOptionsMessage={() => 'No se encontraron opciones'}
