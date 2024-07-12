@@ -6,23 +6,17 @@ import {
   faRightFromBracket,
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
-
 import UserOne from '../../images/user/user-1.jpg';
-
 interface DropdownUserProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
-
 const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-
   const nombre = localStorage.getItem('userName') || 'Nombre';
   const especialidad = localStorage.getItem('userSpecialty') || 'Especialidad';
-
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -37,7 +31,6 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
   });
-
   useEffect(() => {
     const keyHandler = ({ keyCode }: KeyboardEvent) => {
       if (!dropdownOpen || keyCode !== 27) return;
@@ -46,9 +39,14 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
   });
-
   const handleLogout = () => {
     setIsAuthenticated(false);
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userSpecialty');
+    localStorage.removeItem('rolID');
+    sessionStorage.removeItem('sessionCheck');
     navigate('/login');
   };
 
@@ -66,7 +64,6 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
           </span>
           <span className="block text-xs">{especialidad}</span>
         </span>
-
         <span className="h-12 w-12 rounded-full overflow-hidden">
           <img
             src={UserOne}
@@ -74,10 +71,8 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
             className="h-full w-full object-cover"
           />
         </span>
-
         <FontAwesomeIcon icon={faChevronDown} />
       </Link>
-
       <div
         ref={dropdown}
         onFocus={() => setDropdownOpen(true)}
@@ -108,5 +103,4 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
     </div>
   );
 };
-
 export default DropdownUser;

@@ -10,10 +10,10 @@ const useGetAppointments = (medicoID: number) => {
     useEffect(() => {
         const fetchAppointments = async () => {
             try {
-                const response = await axiosInstance.get(`Cita?medicoID=${medicoID}`);
+                const response = await axiosInstance.get(`Cita/medico/${medicoID}`);
                 setAppointments(response.data.result);
             } catch (err) {
-                setError(`Error al obtener las citas ${medicoID}`);
+                setError(`Error al obtener las citas`);
             } finally {
                 setLoading(false);
             }

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BreadcrumbAppointment from '../../components/Breadcrumbs/BreadcrumbAppointment';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faNoteSticky, faFilePen, faChevronDown, faTrash, faCalendarDay, faCalendarCheck, faCalendarXmark, faUserDoctor, faClipboardList, faFileWaveform } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faNoteSticky, faFilePen, faChevronDown, faTrash, faCalendarDay, faCalendarCheck, faCalendarXmark, faUserDoctor, faClipboardList, faFileWaveform, faPills, faHashtag } from '@fortawesome/free-solid-svg-icons';
 import useGetAppointmentById from '../../hooks/Appointments/useGetAppointmentById';
 import useUpdateAppointment from '../../hooks/Appointments/useUpdateAppointment';
 import useDeleteAppointment from '../../hooks/Appointments/useDeleteAppointments';
@@ -17,13 +17,13 @@ interface DashboardProps {
     setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
-const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+const PrescriptionEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     const rol = localStorage.getItem('rolID') || 'rolId';
     const medicoId = localStorage.getItem('userId') || 'Id';
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
     const appointmentId = id ? parseInt(id) : undefined;
-    const { doctors, loading: doctorsLoading } = useGetDoctors();
+    const { doctors, loading: doctorsLoading } = useGetDoctors(Number(rol));
 
     const { appointment, loading, error } = useGetAppointmentById(appointmentId || 0);
     const { updateAppointment, loading: updating, error: updateError } = useUpdateAppointment();
@@ -177,9 +177,18 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                             <div className="border-b border-stroke py-4 px-7 dark:border-strokedark flex justify-between items-center">
                                 <h3 className="font-medium text-black dark:text-white">
-                                    Información de la cita
+                                    RECETA
                                 </h3>
                                 <div className="flex gap-4.5">
+                                    <button
+                                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                                        type="button"
+                                        onClick={() => navigate(`/citas/editar-cita/${id}`)}>
+                                        <FontAwesomeIcon icon={faClipboardList} className="mr-2 mt-1" />
+                                        Regresar
+                                    </button>
+                                </div>
+                                {/* <div className="flex gap-4.5">
                                     <button
                                         className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
                                         type="button"
@@ -191,13 +200,13 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                     <button
                                         className="flex justify-center rounded bg-meta-7 py-2 px-6 font-medium text-gray hover:bg-opacity-90"
                                         type="button"
-                                        onClick={() => navigate(`/recetas/agregar-receta/${id}`)}
+                                        onClick={() => navigate(`/recetas/agregar-receta`)}
                                     // onClick={() => formData.iD_Paciente && handleAppointmetsPatients(formData.iD_Paciente)}
                                     >
                                         <FontAwesomeIcon icon={faFileWaveform} className="mr-2 mt-1" />
                                         Generar receta
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="p-7">
                                 <form onSubmit={handleSubmit}>
@@ -207,7 +216,7 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="nombrePaciente"
                                             >
-                                                Nombre del Paciente
+                                                Paciente
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">
@@ -222,62 +231,72 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </div>
                                         </div>
 
-                                        {rol === '2' && (
-                                            <div className="w-full sm:w-1/2">
-                                                <label
-                                                    className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                                    htmlFor="nombrePaciente"
-                                                >
-                                                    Cambiar médico
-                                                </label>
-                                                <div className="relative">
-                                                    <span className="absolute left-4.5 top-4">
-                                                        <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
-                                                    </span>
-                                                    <Select
-                                                        className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                        options={options}
-                                                        value={selectedDoctor || { value: formData.medicoID, label: formData.nombreMedico || 'Seleccionar médico' }}
-                                                        onChange={handleRolChange}
-                                                        onInputChange={handleInputChange}
-                                                        inputValue={inputValue}
-                                                        isLoading={doctorsLoading}
-                                                        placeholder="Buscar médico..."
-                                                        noOptionsMessage={() => 'No se encontraron opciones'}
-                                                    />
-
-                                                </div>
+                                        <div className="w-full sm:w-1/2">
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                htmlFor="nombreMedico"
+                                            >
+                                                Médico
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute left-4.5 top-4">
+                                                    <FontAwesomeIcon icon={faUser} opacity="0.8" />
+                                                </span>
+                                                <input
+                                                    className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 cursor-not-allowed focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
+                                                    type="text"
+                                                    value={formData.nombreMedico}
+                                                    disabled
+                                                />
                                             </div>
-                                        )
-                                            // : (
-                                            //     <div className="w-full sm:w-1/2">
-                                            //         <label
-                                            //             className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                            //             htmlFor="nombreMedico"
-                                            //         >
-                                            //             Nombre del Médico
-                                            //         </label>
-                                            //         <div className="relative">
-                                            //             <span className="absolute left-4.5 top-4">
-                                            //                 <FontAwesomeIcon icon={faUser} opacity="0.8" />
-                                            //             </span>
-                                            //             <input
-                                            //                 className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 cursor-not-allowed focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
-                                            //                 type="text"
-                                            //                 value={formData.nombreMedico}
-                                            //                 disabled
-                                            //             />
-                                            //         </div>
-                                            //     </div>
-                                            // )
-                                        }
+                                        </div>
+
+                                        <div className="w-full sm:w-1/2">
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                htmlFor="ID_Cita"
+                                            >
+                                                Cita No.
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    className="w-full rounded border-[1.5px] border-stroke px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                                                    type='text'
+                                                    value={'CIT' + formData?.iD_Cita || ''}
+                                                    disabled
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+                                        <div className="w-full sm:w-1/2">
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                htmlFor="diagnostico"
+                                            >
+                                                Diagnóstico
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute left-4.5 top-4">
+                                                    <FontAwesomeIcon icon={faFilePen} opacity="0.8" />
+                                                </span>
+                                                <input
+                                                    className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                    type="text"
+                                                    name="diagnostico"
+                                                    // value={formData?.hora || ''}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
+                                        </div>
 
                                         <div className="w-full sm:w-1/2">
                                             <label
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="fecha"
                                             >
-                                                Fecha
+                                                Fecha inicio
                                             </label>
                                             <div className="relative">
                                                 <input
@@ -285,7 +304,27 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     type='date'
                                                     name="fecha"
                                                     placeholder="mm/dd/yyyy"
-                                                    value={formData?.fecha || ''}
+                                                    // value={formData?.fecha || ''}
+                                                    onChange={handleChange}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="w-full sm:w-1/2">
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                htmlFor="fecha"
+                                            >
+                                                Fecha fin
+                                            </label>
+                                            <div className="relative">
+                                                <input
+                                                    className="w-full rounded border-[1.5px] border-stroke px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
+                                                    type='date'
+                                                    name="fecha"
+                                                    placeholder="mm/dd/yyyy"
+                                                    // value={formData?.fecha || ''}
                                                     onChange={handleChange}
                                                     min={new Date().toISOString().split('T')[0]}
                                                 />
@@ -297,17 +336,20 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         <div className="w-full sm:w-1/2">
                                             <label
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                                htmlFor="hora"
+                                            // htmlFor="hora"
                                             >
-                                                Hora
+                                                Medicamento
                                             </label>
                                             <div className="relative">
+                                                <span className="absolute left-4.5 top-4">
+                                                    <FontAwesomeIcon icon={faPills} opacity="0.8" />
+                                                </span>
                                                 <input
                                                     className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                    type="time"
+                                                    type="text"
                                                     name="hora"
-                                                    value={formData?.hora || ''}
-                                                    onChange={handleChange}
+                                                // value={formData?.hora || ''}
+                                                // onChange={handleChange}
                                                 />
                                             </div>
                                         </div>
@@ -315,9 +357,9 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         <div className="w-full sm:w-1/2">
                                             <label
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                                htmlFor="motivo"
+                                            // htmlFor="motivo"
                                             >
-                                                Motivo
+                                                Dosis
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">
@@ -326,9 +368,9 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 <input
                                                     className={`w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${motivoError ? 'border-red-500' : ''}`}
                                                     type="text"
-                                                    name="motivo"
-                                                    value={formData?.motivo || ''}
-                                                    onChange={handleChange}
+                                                // name="motivo"
+                                                // value={formData?.motivo || ''}
+                                                // onChange={handleChange}
                                                 />
                                             </div>
                                             {motivoError && (
@@ -337,61 +379,52 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         </div>
 
                                         <div className="w-full sm:w-1/2">
-                                            <label className="mb-3 block text-sm font-medium text-black dark:text-white" htmlFor="estatus">
-                                                Estatus
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                            // htmlFor="motivo"
+                                            >
+                                                Cantidad
                                             </label>
-                                            <div className="relative z-20 bg-white dark:bg-form-input">
-                                                <span className="absolute top-1/2 left-4 z-30 -translate-y-1/2">
-                                                    {formData?.estatus === 'Pendiente' && (
-                                                        <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
-                                                    )}
-                                                    {formData?.estatus === 'Terminada' && (
-                                                        <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
-                                                    )}
-                                                    {formData?.estatus === 'Cancelada' && (
-                                                        <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
-                                                    )}
+                                            <div className="relative">
+                                                <span className="absolute left-4.5 top-4">
+                                                    <FontAwesomeIcon icon={faHashtag} opacity="0.8" />
                                                 </span>
-                                                <select
-                                                    name="estatus"
-                                                    value={formData?.estatus || ''}
-                                                    onChange={handleChange}
-                                                    className={'relative z-20 w-full appearance-none rounded border border-stroke bg-transparent py-3 px-12 outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input'}
-                                                >
-                                                    <option value="" disabled>
-                                                        Seleccionar
-                                                    </option>
-                                                    <option value="Pendiente">Pendiente</option>
-                                                    <option value="Terminada">Terminada</option>
-                                                    <option value="Cancelada">Cancelada</option>
-                                                </select>
-                                                <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
-                                                    <FontAwesomeIcon icon={faChevronDown} opacity="0.8" />
-                                                </span>
+                                                <input
+                                                    className={`w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary ${motivoError ? 'border-red-500' : ''}`}
+                                                    type="number"
+                                                // name="motivo"
+                                                // value={formData?.motivo || ''}
+                                                // onChange={handleChange}
+                                                />
                                             </div>
+                                            {motivoError && (
+                                                <p className="mt-1 text-sm text-red-500">{motivoError}</p>
+                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="mb-5.5">
-                                        <label
-                                            className="mb-3 block text-sm font-medium text-black dark:text-white"
-                                            htmlFor="notas"
-                                        >
-                                            Notas (opcional)
-                                        </label>
-                                        <div className="relative">
-                                            <span className="absolute left-4.5 top-4">
-                                                <g opacity="0.8">
-                                                    <FontAwesomeIcon icon={faNoteSticky} />
-                                                </g>
-                                            </span>
-                                            <input
-                                                className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                                                type="text"
-                                                name="notas"
-                                                value={formData?.notas || ''}
-                                                onChange={handleChange}
-                                            />
+                                    <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+                                        <div className='w-full sm:w-1/2'>
+                                            <label
+                                                className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                htmlFor="notas"
+                                            >
+                                                Frencuencia medicamento
+                                            </label>
+                                            <div className="relative">
+                                                <span className="absolute left-4.5 top-4">
+                                                    <g opacity="0.8">
+                                                        <FontAwesomeIcon icon={faNoteSticky} />
+                                                    </g>
+                                                </span>
+                                                <input
+                                                    className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                    type="text"
+                                                    name="notas"
+                                                    value={formData?.notas || ''}
+                                                    onChange={handleChange}
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 
@@ -427,4 +460,4 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     );
 };
 
-export default AppointmentEdit;
+export default PrescriptionEdit;

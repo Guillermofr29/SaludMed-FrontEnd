@@ -18,6 +18,14 @@ const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     const { appointments, loading, error } = useGetAppointments(Number(medicoID));
     const { nextAppointments, loading: loadingNext, error: errorNext } = useGetNextAppointments(Number(medicoID), Number(rolID));
 
+    const formatFecha = (fecha: string) => {
+        const date = new Date(fecha);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
     if (loading || loadingNext) {
         return <p>Cargando citas...</p>;
     }
@@ -33,7 +41,7 @@ const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     Citas
                     <FontAwesomeIcon className='pl-2' icon={faCalendarDays} />
                 </h1>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-lg text-gray-600 dark:text-gray-400">
                     Este es tu apartado de Citas. Aquí puedes encontrar información y
                     herramientas importantes para administrar a tus citas.
                 </p>
@@ -56,7 +64,7 @@ const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             {appointment.nombrePaciente}
                                         </p>
                                         <p className="text-gray-500 dark:text-gray-400">
-                                            <FontAwesomeIcon className='pl-1' icon={faCalendarDay} /> {appointment.fecha} | {appointment.hora} hrs <FontAwesomeIcon className='pl-1' icon={faClock} />
+                                        {formatFecha(appointment.fecha)}<FontAwesomeIcon className='pl-1' icon={faCalendarDay} /> | {appointment.hora} hrs <FontAwesomeIcon className='pl-1' icon={faClock} />
                                         </p>
                                     </div>
                                 </li>

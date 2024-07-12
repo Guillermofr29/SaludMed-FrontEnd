@@ -9,6 +9,6 @@ export interface Patient {
     telefono: string;
     domicilio: string;
     correo: string;
-    MedicoID?: number;
+    medicoID?: number;
     nombreMedico?: string;
 };

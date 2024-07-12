@@ -8,6 +8,7 @@ import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faUserInjured,faCalendar,faCalendarDay} from '@fortawesome/free-solid-svg-icons';
 import useDashboardData from '../../hooks/Dashboard/useDashboardData';
+// import HeatMap from '../HeatMap';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -32,7 +33,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           Bienvenido, Dr. {nombreDoctor}!
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-lg text-gray-600 dark:text-gray-400">
           Este es tu dashboard médico. Aquí puedes encontrar información y
           herramientas importantes para administrar tu práctica médica.
         </p>
@@ -76,6 +77,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
           <TableLastAppointments />
         </div>
         <div className="col-span-12 xl:col-span-6">
+          {/* <HeatMap /> */}
           <TableMostPrescripMed />
         </div>
       </div>

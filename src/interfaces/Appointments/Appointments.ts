@@ -1,7 +1,9 @@
 export interface Appointments {
     iD_Cita: number;
-    PacienteID: number;
-    MedicoID?: number;
+    pacienteID: number;
+    medicoID?: number;
+    correo?: string;
+    telefono?: string;
     nombrePaciente: string;
     nombreMedico: string;
     fecha: string;

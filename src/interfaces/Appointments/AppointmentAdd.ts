@@ -2,7 +2,7 @@ export interface AppointmentAddi {
     // iD_Cita?: number;
     nombreMedico?: string;
     PacienteID: number;
-    MedicoID: number;
+    medicoID: number;
     fecha: string;
     hora: string;
     motivo:string;

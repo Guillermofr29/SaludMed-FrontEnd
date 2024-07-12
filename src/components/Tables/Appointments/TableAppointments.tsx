@@ -11,6 +11,7 @@ const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
 const AppointmentsTable: React.FC = () => {
+    const rol = localStorage.getItem('rolID');
     const MedicoID = localStorage.getItem('userId') || 'Id';
     const { appointments: initialAppointments, loading, error } = useGetAppointments(Number(MedicoID));
     const { deleteAppointment, error: deleteError } = useDeleteAppointment();
@@ -20,6 +21,14 @@ const AppointmentsTable: React.FC = () => {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
+
+    const formatFecha = (fecha: string) => {
+        const date = new Date(fecha);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
@@ -144,9 +153,7 @@ const AppointmentsTable: React.FC = () => {
 
     return (
         <div className="overflow-x-auto rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
-            <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">
-                Historial de citas
-            </h4>
+            <h4 className="mb-6 text-xl font-semibold text-black dark:text-white">Historial de cita</h4>
             <div className="flex items-center justify-between flex-col flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 dark:border-strokedark dark:bg-boxdark">
                 <div>
                     <button
@@ -169,7 +176,7 @@ const AppointmentsTable: React.FC = () => {
                             >
                                 <li>
                                     <a
-                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        className="block px-4 py-2 hover:bg-gray dark:hover:bg-gray-600 dark:hover:text-white"
                                         onClick={() => handleOptionClick('Todos')}
                                     >
                                         Todos
@@ -177,7 +184,7 @@ const AppointmentsTable: React.FC = () => {
                                 </li>
                                 <li>
                                     <a
-                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        className="block px-4 py-2 hover:bg-gray dark:hover:bg-gray-600 dark:hover:text-white"
                                         onClick={() => handleOptionClick('Terminada')}
                                     >
                                         Terminada
@@ -185,7 +192,7 @@ const AppointmentsTable: React.FC = () => {
                                 </li>
                                 <li>
                                     <a
-                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        className="block px-4 py-2 hover:bg-gray dark:hover:bg-gray-600 dark:hover:text-white"
                                         onClick={() => handleOptionClick('Pendiente')}
                                     >
                                         Pendiente
@@ -193,7 +200,7 @@ const AppointmentsTable: React.FC = () => {
                                 </li>
                                 <li>
                                     <a
-                                        className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                                        className="block px-4 py-2 hover:bg-gray dark:hover:bg-gray-600 dark:hover:text-white"
                                         onClick={() => handleOptionClick('Cancelada')}
                                     >
                                         Cancelada
@@ -257,14 +264,16 @@ const AppointmentsTable: React.FC = () => {
                     <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                ID
+                                Cita No.
                             </th>
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Paciente
                             </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Médico
-                            </th>
+                            {rol === '2' &&(
+                                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Médico
+                                </th>
+                            )}
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Fecha
                             </th>
@@ -294,11 +303,13 @@ const AppointmentsTable: React.FC = () => {
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {appointment.nombrePaciente}
                                 </td>
+                                {rol === '2' &&(
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {appointment.nombreMedico}
+                                    </td>
+                                )}
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {appointment.nombreMedico}
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {appointment.fecha}
+                                    {formatFecha(appointment.fecha)}
                                 </td>
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {appointment.hora}

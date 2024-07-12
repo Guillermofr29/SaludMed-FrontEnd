@@ -18,7 +18,7 @@ const Patients: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
           Pacientes
           <FontAwesomeIcon className='pl-2' icon={faUserInjured} />
         </h1>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-lg text-gray-600 dark:text-gray-400">
           Este es tu apartado de Citas. Aquí puedes gestionar y programar las citas de tus pacientes, así como acceder a herramientas importantes relacionadas con la programación y administración de citas.
         </p>
 

@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import BreadcrumbAppointment from '../../components/Breadcrumbs/BreadcrumbAppointment';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faNoteSticky, faChevronDown, faFilePen, faCalendarDay, faCalendarCheck, faCalendarXmark } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faNoteSticky, faChevronDown, faFilePen, faCalendarDay, faCalendarCheck, faCalendarXmark, faUserDoctor } from '@fortawesome/free-solid-svg-icons';
 import useAddAppointment from '../../hooks/Appointments/useAddAppointment';
 import { AppointmentAddi } from '../../interfaces/Appointments/AppointmentAdd';
 import { showAlert, showSuccessAlert, showErrorAlert } from '../../components/Alerts/AppointmentAlert';
 import { validateOnlyString } from '../../components/Validations/Patients/PatientValidation';
 import useGetPatients from '../../hooks/Patients/useGetPatients';
+import useGetDoctors from '../../hooks/Doctors/useGetDoctors';
 import Select from 'react-select';
 
 interface DashboardProps {
@@ -16,17 +17,21 @@ interface DashboardProps {
 }
 
 const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
-    
+
     const navigate = useNavigate();
     const medicoId = localStorage.getItem('userId') || 'Id';
     const medicoNombre = localStorage.getItem('userName') || 'Nombre';
-    // const rol = localStorage.getItem('rolID') || 'rolId';
-    const { patients, loading: patientsLoading } = useGetPatients(Number(medicoId));
+    const rol = localStorage.getItem('rolID') || 'rolId';
+    
+    const { patients, loading: patientsLoading } = useGetPatients();
     const { addAppointment, loading, error, success } = useAddAppointment();
+    const [selectedDoctor, setSelectedDoctor] = useState<{ value: number; label: string } | null>(null);
+    const [inputValueDoc, setInputValueDoc] = useState<string>('');
+    const { doctors, loading: doctorsLoading } = useGetDoctors();
 
     const [formData, setFormData] = useState<AppointmentAddi>({
         PacienteID: 0,
-        MedicoID: parseInt(medicoId),
+        medicoID: Number(rol) === 2 ? Number(selectedDoctor?.value) : Number(medicoId),
         fecha: '',
         hora: '',
         motivo: '',
@@ -69,24 +74,58 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (motivoError || !selectedPatient) {
+        const {fecha, hora, motivo} = formData;
+
+        if(!fecha || !hora || !motivo){
+            showAlert('Error', 'No tienen que haber campos vacíos', 'error');
+            return;
+        }
+
+        if (motivoError || !selectedPatient || (Number(rol) === 2 && !selectedDoctor)) {
             showAlert('Error', 'Por favor, corrija los errores en el formulario antes de continuar.', 'error');
             return;
         }
 
         try {
-            const formattedData = {
-                ...formData,
-                PacienteID: selectedPatient.value,
-                motivo: formatMotivo(formData.motivo),
-                MedicoID: parseInt(medicoId),
-                estatus: 'Pendiente',
-            };
+            let formattedData = { ...formData };
+
+            if (Number(rol) === 2 && selectedDoctor && selectedPatient) {
+                formattedData = {
+                    ...formattedData,
+                    medicoID: selectedDoctor.value,
+                    PacienteID: selectedPatient.value,
+                    motivo: formatMotivo(formData.motivo),
+                    estatus: 'Pendiente',
+                };
+            } else {
+                formattedData = {
+                    ...formattedData,
+                    medicoID: parseInt(medicoId),
+                    PacienteID: selectedPatient.value,
+                    motivo: formatMotivo(formData.motivo),
+                    estatus: 'Pendiente',
+                };
+            }
+
             await addAppointment(formattedData);
         } catch (err) {
             console.error('Error al agregar la cita', err);
             showErrorAlert();
         }
+
+        // try {
+        //     const formattedData = {
+        //         ...formData,
+        //         PacienteID: selectedPatient.value,
+        //         motivo: formatMotivo(formData.motivo),
+        //         medicoID: parseInt(medicoId),
+        //         estatus: 'Pendiente',
+        //     };
+        //     await addAppointment(formattedData);
+        // } catch (err) {
+        //     console.error('Error al agregar la cita', err);
+        //     showErrorAlert();
+        // }
     };
 
     const handleInputChange = (newValue: string) => {
@@ -102,10 +141,23 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         label: `${patient.nombre} ${patient.apellido}`,
     }));
 
+    const handleInputDocChange = (newValue: string) => {
+        setInputValueDoc(newValue);
+    };
+
+    const handleDoctorChange = (selectedOption: any) => {
+        setSelectedDoctor(selectedOption);
+    };
+
+    const optionsDoc = doctors.map(doctor => ({
+        value: doctor.iD_Medico,
+        label: `${doctor.nombre} ${doctor.apellido}`,
+    }));
+
     return (
         <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
             <div className="mx-auto max-w-270">
-                <BreadcrumbAppointment pageName="Agregar Nueva Cita" />
+                <BreadcrumbAppointment pageName="Agregar Cita" />
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-5 xl:col-span-3">
                         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
@@ -117,12 +169,60 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                             <div className="p-7">
                                 <form onSubmit={handleSubmit}>
                                     <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
+                                    {rol === '2' ? (
+                                            <div className="w-full sm:w-1/2">
+                                                <label
+                                                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                    htmlFor="nombrePaciente"
+                                                >
+                                                    Seleccionar médico {selectedDoctor?.value || 0}
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-4.5 top-4">
+                                                        <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                                                    </span>
+                                                    <Select
+                                                        className="w-full rounded border-stroke py-1.5 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                        options={optionsDoc}
+                                                        value={selectedDoctor}
+                                                        onChange={handleDoctorChange}
+                                                        onInputChange={handleInputDocChange}
+                                                        inputValue={inputValueDoc}
+                                                        isLoading={doctorsLoading}
+                                                        placeholder="Buscar médico..."
+                                                        noOptionsMessage={() => 'No se encontraron opciones'}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="w-full sm:w-1/2">
+                                                <label
+                                                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                                    htmlFor="nombreMedico"
+                                                >
+                                                    Nombre del Médico {formData.medicoID}
+                                                </label>
+                                                <div className="relative">
+                                                    <span className="absolute left-4.5 top-4">
+                                                        <FontAwesomeIcon icon={faUserDoctor} opacity="0.8" />
+                                                    </span>
+                                                    <input
+                                                        className={'w-full rounded border border-stroke bg-gray-200 py-3 pl-11.5 pr-4.5 text-gray-500 cursor-not-allowed focus:border-gray-300 focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-gray-500 dark:focus:border-gray-300'}
+                                                        type="text"
+                                                        name='nombreMedico'
+                                                        value={medicoNombre}
+                                                        disabled
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                        
                                         <div className="w-full sm:w-1/2">
                                             <label
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="nombrePaciente"
                                             >
-                                                Nombre del Paciente
+                                                Seleccionar paciente {selectedPatient?.value}
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">
@@ -142,7 +242,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             </div>
                                         </div>
 
-                                        <div className="w-full sm:w-1/2">
+                                        {/* <div className="w-full sm:w-1/2">
                                             <label
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="nombreMedico"
@@ -162,7 +262,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 >
                                                 </input>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                         <div className="w-full sm:w-1/2">
                                             <label
@@ -178,6 +278,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     name="fecha"
                                                     value={formData.fecha}
                                                     onChange={handleChange}
+                                                    min={new Date().toISOString().split('T')[0]}
                                                 />
                                             </div>
                                         </div>
@@ -198,6 +299,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     name="hora"
                                                     value={formData.hora}
                                                     onChange={handleChange}
+                                                    // min={new Date().toLocaleTimeString('en-US', { hour12: false }).slice(0, -3)}
                                                 />
                                             </div>
                                         </div>
@@ -266,7 +368,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                             className="mb-3 block text-sm font-medium text-black dark:text-white"
                                             htmlFor="notas"
                                         >
-                                            Notas
+                                            Notas (opcional)
                                         </label>
                                         <div className="relative">
                                             <span className="absolute left-4.5 top-4">
