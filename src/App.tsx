@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -17,25 +17,18 @@ import PrescriptionEdit from './pages/Prescriptions/PrescriptionEdit';
 import RecetaPDF from './pages/RecetaPDF';
 import Perfil from './pages/Perfil/Perfil';
 
-const INACTIVITY_TIME = 960000; //Esto es 5 minutos
-//60000 1 minuto
+const INACTIVITY_TIME = 600000; // 10 minutos
+//20000 20 segundos
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const lastActivityRef = useRef(Date.now());
   const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-
-  useEffect(() => {
-    const authState = localStorage.getItem('isAuthenticated');
-    if (authState === 'true') {
-      setIsAuthenticated(true);
-    }
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
 
   useEffect(() => {
     const authState = localStorage.getItem('isAuthenticated');
@@ -48,26 +41,11 @@ function App() {
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
-  useEffect(() => {
-    let inactivityTimeout: NodeJS.Timeout;
-
-    const handleUserActivity = () => {
-      clearTimeout(inactivityTimeout);
-      inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
-    };
-
-    handleUserActivity();
-
-    window.addEventListener('mousemove', handleUserActivity);
-    window.addEventListener('keypress', handleUserActivity);
-    window.addEventListener('scroll', handleUserActivity);
-    return () => {
-      window.removeEventListener('mousemove', handleUserActivity);
-      window.removeEventListener('keypress', handleUserActivity);
-      window.removeEventListener('scroll', handleUserActivity);
-    };
+  const handleUserActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
   }, []);
-  const handleLogout = () => {
+
+  const handleLogout = useCallback(() => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userId');
@@ -75,12 +53,43 @@ function App() {
     localStorage.removeItem('userSpecialty');
     localStorage.removeItem('rolID');
     sessionStorage.removeItem('sessionCheck');
-  };
+  }, []);
+
+  useEffect(() => {
+    const checkInactivity = () => {
+      if (
+        isAuthenticated &&
+        Date.now() - lastActivityRef.current > INACTIVITY_TIME
+      ) {
+        handleLogout();
+      }
+    };
+
+    const inactivityInterval = setInterval(checkInactivity, 1000); // Revisar cada segundo
+
+    const activityHandler = () => {
+      handleUserActivity();
+    };
+
+    window.addEventListener('mousemove', activityHandler);
+    window.addEventListener('keypress', activityHandler);
+    window.addEventListener('scroll', activityHandler);
+
+    return () => {
+      clearInterval(inactivityInterval);
+      window.removeEventListener('mousemove', activityHandler);
+      window.removeEventListener('keypress', activityHandler);
+      window.removeEventListener('scroll', activityHandler);
+    };
+  }, [handleLogout, handleUserActivity, isAuthenticated]);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
     sessionStorage.setItem('sessionCheck', 'true');
+    lastActivityRef.current = Date.now();
   };
+
   return loading ? (
     <Loader />
   ) : (
@@ -244,7 +253,6 @@ function App() {
             )
           }
         />
-
         <Route
           path="/*"
           element={
@@ -258,4 +266,5 @@ function App() {
     </>
   );
 }
+
 export default App;
