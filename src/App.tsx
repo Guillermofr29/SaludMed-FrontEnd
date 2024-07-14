@@ -8,22 +8,22 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Patients from './pages/Patients/Patients';
 import PatientEdit from './pages/Patients/PatientEdit';
 import PatientAdd from './pages/Patients/PatientAdd';
-import PatientAppointments from './pages/Patients/PatientAppointments'
+import PatientAppointments from './pages/Patients/PatientAppointments';
 import Citas from './pages/Appointments/Appointments';
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AppointmentAdd from './pages/Appointments/AppointmentAdd';
 import PrescriptionAdd from './pages/Prescriptions/PrescriptionAdd';
 import PrescriptionEdit from './pages/Prescriptions/PrescriptionEdit';
 import RecetaPDF from './pages/RecetaPDF';
+import Perfil from './pages/Perfil/Perfil';
+
+const INACTIVITY_TIME = 960000; //Esto es 5 minutos
+//60000 1 minuto
 
 function App() {
-
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const { pathname } = useLocation();
-
-  const INACTIVITY_TIME = 960000; //Esto es 5 minutos
-//60000 1 minuto
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -231,6 +231,20 @@ function App() {
             </>
           }
         />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Mi Perfil | SaludMed" />
+                <Perfil setIsAuthenticated={handleLogout} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+
         <Route
           path="/*"
           element={
