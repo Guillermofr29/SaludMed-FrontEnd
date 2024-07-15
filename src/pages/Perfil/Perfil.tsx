@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import DefaultLayout from '../../layout/DefaultLayout';
 import usePerfil from '../../hooks/Perfil/usePerfil';
 import { showConfirmationAlertPerfil } from '../../components/Alerts/PerfilAlert';
+import { useUser } from '../../context/UserContex';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -40,6 +41,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  const { setUser } = useUser();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (medico) {
@@ -59,6 +62,12 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         );
 
         if (success) {
+          setUser({
+            id: localStorage.getItem('userId') || '',
+            name: `${formData.nombres} ${formData.apellidos}`,
+            specialty: formData.especialidad,
+            roleID: localStorage.getItem('rolID') || '',
+          });
           Swal.fire({
             icon: 'success',
             title: '¡Datos actualizados con éxito!',
@@ -105,7 +114,7 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                 <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                   <div className="w-full sm:w-1/2">
                     <label
-                      className="mb-3 block text-sm font-medium text-black dark:text-white"
+                      className="mb-3 block text-sm font-medium text-black dark:text-white "
                       htmlFor="nombres"
                     >
                       Nombres

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../../api/axiosConfig';
+import { useUser } from '../../context/UserContex';
 
 interface Medico {
   id?: number;
@@ -32,6 +33,8 @@ const usePerfil = (id: number) => {
     fetchMedico();
   }, [id]);
 
+  const { setUser } = useUser();
+
   const updateMedico = async (
     updatedMedico: Medico,
     nuevaContrasena?: string,
@@ -42,6 +45,20 @@ const usePerfil = (id: number) => {
         contrasena: nuevaContrasena,
       });
       setMedico(updatedMedico);
+
+      setUser({
+        id: id.toString(), 
+        name: `${updatedMedico.nombre} ${updatedMedico.apellido}`,
+        specialty: updatedMedico.especialidad,
+        roleID: localStorage.getItem('rolID') || '',
+      });
+
+      localStorage.setItem(
+        'userName',
+        `${updatedMedico.nombre} ${updatedMedico.apellido}`,
+      );
+      localStorage.setItem('userSpecialty', updatedMedico.especialidad);
+
       return true;
     } catch (err) {
       setError('Error al actualizar los datos del médico');
