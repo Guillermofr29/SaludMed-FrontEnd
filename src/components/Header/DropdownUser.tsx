@@ -7,6 +7,8 @@ import {
   faChevronDown,
 } from '@fortawesome/free-solid-svg-icons';
 import UserOne from '../../images/user/user-1.jpg';
+import { useUser } from '../../context/UserContex';
+
 interface DropdownUserProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
@@ -15,8 +17,9 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-  const nombre = localStorage.getItem('userName') || 'Nombre';
-  const especialidad = localStorage.getItem('userSpecialty') || 'Especialidad';
+  const { user } = useUser();
+  const nombre = user?.name || 'Nombre';
+  const especialidad = user?.specialty || 'Especialidad';
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!dropdown.current) return;
@@ -39,6 +42,20 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
     document.addEventListener('keydown', keyHandler);
     return () => document.removeEventListener('keydown', keyHandler);
   });
+
+  // useEffect(() => {
+  //   const handleStorageChange = () => {
+  //     setNombre(localStorage.getItem('userName') || 'Nombre');
+  //     setEspecialidad(localStorage.getItem('userSpecialty') || 'Especialidad');
+  //   };
+
+  //   window.addEventListener('storage', handleStorageChange);
+
+  //   return () => {
+  //     window.removeEventListener('storage', handleStorageChange);
+  //   };
+  // }, []);
+
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');

@@ -1,11 +1,95 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
 import DefaultLayout from '../../layout/DefaultLayout';
+import usePerfil from '../../hooks/Perfil/usePerfil';
+import { showConfirmationAlertPerfil } from '../../components/Alerts/PerfilAlert';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
 }
 
 const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+  const id = parseInt(localStorage.getItem('userId') || '0');
+  const { medico, loading, error, updateMedico } = usePerfil(id);
+  const [formData, setFormData] = useState({
+    nombres: '',
+    apellidos: '',
+    especialidad: '',
+    cedulaProfesional: '',
+    telefono: '',
+    correo: '',
+    contrasena: '',
+  });
+
+  useEffect(() => {
+    if (medico) {
+      setFormData({
+        nombres: medico.nombre,
+        apellidos: medico.apellido,
+        especialidad: medico.especialidad,
+        cedulaProfesional: medico.cedulaProfesional,
+        telefono: medico.telefono,
+        correo: medico.correo,
+        contrasena: '',
+      });
+    }
+  }, [medico]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (medico) {
+      const confirmed = await showConfirmationAlertPerfil();
+      if (confirmed) {
+        const success = await updateMedico(
+          {
+            ...medico,
+            nombre: formData.nombres,
+            apellido: formData.apellidos,
+            especialidad: formData.especialidad,
+            cedulaProfesional: formData.cedulaProfesional,
+            telefono: formData.telefono,
+            correo: formData.correo,
+          },
+          formData.contrasena || undefined,
+        );
+
+        if (success) {
+          Swal.fire({
+            icon: 'success',
+            title: '¡Datos actualizados con éxito!',
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error al actualizar datos',
+            text: 'Hubo un problema al intentar actualizar los datos del médico.',
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'info',
+          title: 'Cambios cancelados',
+          text: 'No se realizaron cambios en los datos del médico.',
+        });
+      }
+    }
+  };
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
       <div className="flex justify-center items-center min-h-screen bg-gray-100 dark:bg-boxdark-2">
@@ -17,7 +101,7 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
               </h3>
             </div>
             <div className="p-7">
-              <form action="#">
+              <form onSubmit={handleSubmit}>
                 <div className="mb-5.5 flex flex-col gap-5.5 sm:flex-row">
                   <div className="w-full sm:w-1/2">
                     <label
@@ -31,6 +115,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       type="text"
                       name="nombres"
                       id="nombres"
+                      value={formData.nombres}
+                      onChange={handleInputChange}
                       placeholder="Juan"
                     />
                   </div>
@@ -47,6 +133,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       type="text"
                       name="apellidos"
                       id="apellidos"
+                      value={formData.apellidos}
+                      onChange={handleInputChange}
                       placeholder="Pérez"
                     />
                   </div>
@@ -64,6 +152,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     type="text"
                     name="especialidad"
                     id="especialidad"
+                    value={formData.especialidad}
+                    onChange={handleInputChange}
                     placeholder="Cardiología"
                   />
                 </div>
@@ -80,6 +170,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     type="text"
                     name="cedulaProfesional"
                     id="cedulaProfesional"
+                    value={formData.cedulaProfesional}
+                    onChange={handleInputChange}
                     placeholder="123456789"
                   />
                 </div>
@@ -96,6 +188,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     type="tel"
                     name="telefono"
                     id="telefono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
                     placeholder="+1234567890"
                   />
                 </div>
@@ -112,6 +206,8 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     type="email"
                     name="correo"
                     id="correo"
+                    value={formData.correo}
+                    onChange={handleInputChange}
                     placeholder="ejemplo@correo.com"
                   />
                 </div>
@@ -128,7 +224,9 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                     type="password"
                     name="contrasena"
                     id="contrasena"
-                    placeholder="············"
+                    value={formData.contrasena}
+                    onChange={handleInputChange}
+                    placeholder="No cambie la contreseña si no es necesario (Deje vacio)"
                   />
                 </div>
 

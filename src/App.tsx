@@ -16,6 +16,7 @@ import PrescriptionAdd from './pages/Prescriptions/PrescriptionAdd';
 import PrescriptionEdit from './pages/Prescriptions/PrescriptionEdit';
 import RecetaPDF from './pages/RecetaPDF';
 import Perfil from './pages/Perfil/Perfil';
+import { UserProvider } from './context/UserContex';
 
 const INACTIVITY_TIME = 600000; // 10 minutos
 //20000 20 segundos
@@ -93,7 +94,7 @@ function App() {
   return loading ? (
     <Loader />
   ) : (
-    <>
+    <UserProvider>
       <Routes>
         <Route
           path="/login"
@@ -263,7 +264,7 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </UserProvider>
   );
 }
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import CardDashboard from '../../components/Cards/Dashboard/CardDashboard';
 import MostCommonDiseases from '../../components/Charts/MostCommonDiseases';
 import QuantityBySex from '../../components/Charts/QuantityBySex';
@@ -6,8 +6,13 @@ import TableLastAppointments from '../../components/Tables/Dashboard/TableLastAp
 import TableMostPrescripMed from '../../components/Tables/Dashboard/TableMostPrescripMed';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {faUserInjured,faCalendar,faCalendarDay} from '@fortawesome/free-solid-svg-icons';
+import {
+  faUserInjured,
+  faCalendar,
+  faCalendarDay,
+} from '@fortawesome/free-solid-svg-icons';
 import useDashboardData from '../../hooks/Dashboard/useDashboardData';
+import { useUser } from '../../context/UserContex';
 // import HeatMap from '../HeatMap';
 
 interface DashboardProps {
@@ -15,9 +20,24 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
+  const { user } = useUser();
   const MedicoID = localStorage.getItem('userId') || 'Id';
-  const nombreDoctor = localStorage.getItem('userName') || 'Nombre';
+  const [nombreDoctor, setNombreDoctor] = useState(
+    localStorage.getItem('userName') || 'Nombre',
+  );
   const { data, loading, error } = useDashboardData(Number(MedicoID));
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setNombreDoctor(localStorage.getItem('userName') || 'Nombre');
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   if (loading) {
     return <div>Cargando...</div>;
@@ -31,7 +51,7 @@ const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     <DefaultLayout setIsAuthenticated={setIsAuthenticated}>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-          Bienvenido, Dr. {nombreDoctor}!
+          Bienvenido, Dr. {user?.name}!
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
           Este es tu dashboard médico. Aquí puedes encontrar información y
