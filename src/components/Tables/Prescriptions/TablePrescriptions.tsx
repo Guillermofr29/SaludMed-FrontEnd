@@ -1,22 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPenToSquare, faUserPlus, faMagnifyingGlass, faCaretLeft, faCaretRight, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { Patient } from '../../../interfaces/Patients/Patients';
-import useGetPatients from '../../../hooks/Patients/useGetPatients';
+import { faPenToSquare, faUserPlus, faMagnifyingGlass, faCaretLeft, faCaretRight, faTrash, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { showDeleteConfirmation, showDeleteSuccessAlert, showErrorAlert } from '../../../components/Alerts/PatientAlert';
+import useGetPrescriptions from '../../../hooks/Prescriptions/useGetPrescriptions';
+import { PrescriptionTableI } from '../../../interfaces/Prescription/PrescripTable';
+import useDeletePrescriptions from '../../../hooks/Prescriptions/useDeletePrescriptions';
 
 const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
-const PatientTable: React.FC = () => {
-    // const rol = localStorage.getItem('rolID') || 'rolId';
-    // const MedicoID = localStorage.getItem('userId') || 'Id';
-    const { patients: initialPatients, loading, error, deletePatient } = useGetPatients();
-    const [patients, setPatients] = useState<Patient[]>(initialPatients);
+const PrescriptionTable: React.FC = () => {
+    const rol = localStorage.getItem('rolID') || 'rolId';
+    const MedicoID = localStorage.getItem('userId') || 'Id';
+    const { prescriptions: initialPrescription, loading, error } = useGetPrescriptions(Number(MedicoID), Number(rol));
+
+    const [patients, setPatients] = useState<PrescriptionTableI[]>(initialPrescription);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(0);
     const navigate = useNavigate();
+
+    const { deletePrescription, error: deleteError } = useDeletePrescriptions();
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -24,18 +28,17 @@ const PatientTable: React.FC = () => {
     };
 
     useEffect(() => {
-        setPatients(initialPatients);
-    }, [initialPatients]);
+        setPatients(initialPrescription);
+    }, [initialPrescription]);
 
     const filterPatients = (query: string) => {
         if (!query.trim()) {
-            setPatients(initialPatients);
+            setPatients(initialPrescription);
         } else {
-            const filteredPatients = initialPatients.filter(patient => {
+            const filteredPatients = initialPrescription.filter(prescription => {
                 const keywords = query.toLowerCase().split(' ');
                 return keywords.every(keyword =>
-                    patient.nombre.toLowerCase().includes(keyword) ||
-                    patient.apellido.toLowerCase().includes(keyword)
+                    prescription.nombrePaciente?.toLowerCase().includes(keyword)
                 );
             });
             setPatients(filteredPatients);
@@ -55,12 +58,12 @@ const PatientTable: React.FC = () => {
         setCurrentPage(page);
     };
 
-    const handleDeletePatient = async (id: number) => {
+    const handleDeletePrescription = async (id: number) => {
         const confirmed = await showDeleteConfirmation();
         if (confirmed) {
             try {
-                await deletePatient(id);
-                setPatients(prevPatients => prevPatients.filter(patient => patient.iD_Paciente !== id));
+                await deletePrescription(id);
+                setPatients(prevPatients => prevPatients.filter(prescription => prescription.iD_Receta !== id));
                 showDeleteSuccessAlert();
             } catch (err) {
                 showErrorAlert();
@@ -77,8 +80,8 @@ const PatientTable: React.FC = () => {
         return <p>Cargando...</p>;
     }
 
-    if (error) {
-        return <p>{error}</p>;
+    if (error || deleteError) {
+        return <p>{error} || {deleteError}</p>;
     }
 
     const getPageNumbers = () => {
@@ -171,25 +174,16 @@ const PatientTable: React.FC = () => {
                     <thead className="bg-gray-50 dark:bg-gray-800">
                         <tr>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nombre
+                                No. Receta
+                            </th>
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Paciente
                             </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                Médico
+                                No. Cita
                             </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Sexo
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Edad
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Peso
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Estatura
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Teléfono
+                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                                Diagnostico
                             </th>
                             <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Acciones
@@ -197,34 +191,25 @@ const PatientTable: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
-                        {currentPatients.map((patient) => (
-                            <tr key={patient.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                        {currentPatients.map((prescription) => (
+                            <tr key={prescription.iD_Receta} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.nombre} {patient.apellido}
+                                    {prescription.iD_Receta}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {prescription.nombrePaciente}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                                    {patient.nombreMedico}
+                                    {prescription.citaID}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.sexo}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.edad}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.peso}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.estatura}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.telefono}
+                                <td className="px-6 py-4 whitespace-normal text-sm text-gray-500 hidden md:table-cell">
+                                    {prescription.diagnostico}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <button className="text-meta-5" onClick={() => handleEditPatient(patient.iD_Paciente)}>
-                                        <FontAwesomeIcon className="p-2" icon={faPenToSquare} />
+                                    <button className="text-meta-5" onClick={() => handleEditPatient(prescription.iD_Receta)}>
+                                        <FontAwesomeIcon className="p-2" icon={faDownload} />
                                     </button>
-                                    <button className="text-meta-1" onClick={() => handleDeletePatient(patient.iD_Paciente)}>
+                                    <button className="text-meta-1" onClick={() => handleDeletePrescription(prescription.iD_Receta)}>
                                         <FontAwesomeIcon className="p-2" icon={faTrash} />
                                     </button>
                                 </td>
@@ -237,4 +222,4 @@ const PatientTable: React.FC = () => {
     );
 };
 
-export default PatientTable;
+export default PrescriptionTable;

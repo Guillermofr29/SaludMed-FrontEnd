@@ -23,11 +23,13 @@ const AppointmentsTable: React.FC = () => {
     const navigate = useNavigate();
 
     const formatFecha = (fecha: string) => {
-        const date = new Date(fecha);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
+        const [year, month, day] = fecha.split('-');
+        // Crear una fecha sin considerar la zona horaria local
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+        const formattedDay = String(date.getDate()).padStart(2, '0');
+        const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+        const formattedYear = date.getFullYear();
+        return `${formattedDay}-${formattedMonth}-${formattedYear}`;
     };
 
     const toggleDropdown = () => {
@@ -269,24 +271,24 @@ const AppointmentsTable: React.FC = () => {
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Paciente
                             </th>
-                            {rol === '2' &&(
-                                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {rol === '2' && (
+                                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                     Médico
                                 </th>
                             )}
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                 Fecha
                             </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                 Hora
                             </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                 Motivo
                             </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                 Notas
                             </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                 Estatus
                             </th>
                             <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -303,36 +305,36 @@ const AppointmentsTable: React.FC = () => {
                                 <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                     {appointment.nombrePaciente}
                                 </td>
-                                {rol === '2' &&(
-                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {rol === '2' && (
+                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                                         {appointment.nombreMedico}
                                     </td>
                                 )}
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                                     {formatFecha(appointment.fecha)}
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
                                     {appointment.hora}
                                 </td>
-                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden lg:table-cell">
                                     {appointment.motivo}
                                 </td>
-                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden lg:table-cell">
                                     {appointment.notas}
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
                                     <p className={`${getStatusClassName(appointment.estatus)}`}>
-                                    <span className="pr-1">
-                                        {appointment.estatus === 'Pendiente' && (
-                                            <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
-                                        )}
-                                        {appointment.estatus === 'Terminada' && (
-                                            <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
-                                        )}
-                                        {appointment.estatus === 'Cancelada' && (
-                                            <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
-                                        )}
-                                    </span>
+                                        <span className="pr-1">
+                                            {appointment.estatus === 'Pendiente' && (
+                                                <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
+                                            )}
+                                            {appointment.estatus === 'Terminada' && (
+                                                <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
+                                            )}
+                                            {appointment.estatus === 'Cancelada' && (
+                                                <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
+                                            )}
+                                        </span>
                                         {appointment.estatus}
                                     </p>
                                 </td>
