@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserDoctor, faLock, faEyeSlash, faEye } from '@fortawesome/free-solid-svg-icons';
+import {
+  faUserDoctor,
+  faLock,
+  faEyeSlash,
+  faEye,
+  faArrowLeft,
+} from '@fortawesome/free-solid-svg-icons';
 import useAuthentication from '../hooks/Login/useLogin';
 
 interface LoginProps {
@@ -27,6 +34,16 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
 
   return (
     <div className="flex h-screen">
+      <Link
+        to="/"
+        className="absolute top-4 left-4 text-white sm:text-customBlue lg:text-customBlue hover:text-gray-300 transition-colors duration-300"
+      >
+        <FontAwesomeIcon icon={faArrowLeft} size="lg" />
+        <span className="ml-2 text-sm sm:text-base md:text-lg lg:text-xl">
+          Volver
+        </span>
+      </Link>
+
       <div className="hidden sm:flex sm:flex-1 bg-gray-100 items-center justify-center">
         <div className="text-center">
           <img
@@ -69,7 +86,10 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
               </div>
             </div>
             <div className="mb-6">
-              <label htmlFor="contraseña" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="contraseña"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Contraseña
               </label>
               <div className="relative">
@@ -90,7 +110,10 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
                   className="absolute right-3 top-2.5"
                   onClick={toggleMostrarContraseña}
                 >
-                  <FontAwesomeIcon icon={mostrarContraseña ? faEyeSlash : faEye} opacity="0.8" />
+                  <FontAwesomeIcon
+                    icon={mostrarContraseña ? faEyeSlash : faEye}
+                    opacity="0.8"
+                  />
                 </button>
               </div>
               {error && (

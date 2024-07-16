@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -8,34 +8,30 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Patients from './pages/Patients/Patients';
 import PatientEdit from './pages/Patients/PatientEdit';
 import PatientAdd from './pages/Patients/PatientAdd';
-import PatientAppointments from './pages/Patients/PatientAppointments'
+import PatientAppointments from './pages/Patients/PatientAppointments';
 import Citas from './pages/Appointments/Appointments';
 import AppointmentEdit from './pages/Appointments/AppointmentEdit';
 import AppointmentAdd from './pages/Appointments/AppointmentAdd';
 import PrescriptionAdd from './pages/Prescriptions/PrescriptionAdd';
 import PrescriptionEdit from './pages/Prescriptions/PrescriptionEdit';
-import RecetaPDF from './pages/RecetaPDF';
+import Prescriptions from './pages/Prescriptions/Prescriptions';
+import Perfil from './pages/Perfil/Perfil';
+import HomePage from './pages/HomePage/Context';
+import { UserProvider } from './context/UserContext';
+
+const INACTIVITY_TIME = 960000; // 10 minutos
+//20000 20 segundos
 
 function App() {
-
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const lastActivityRef = useRef(Date.now());
   const { pathname } = useLocation();
-
-  const INACTIVITY_TIME = 960000; //Esto es 5 minutos
-//60000 1 minuto
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-
-  useEffect(() => {
-    const authState = localStorage.getItem('isAuthenticated');
-    if (authState === 'true') {
-      setIsAuthenticated(true);
-    }
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
 
   useEffect(() => {
     const authState = localStorage.getItem('isAuthenticated');
@@ -48,26 +44,11 @@ function App() {
     setTimeout(() => setLoading(false), 1000);
   }, []);
 
-  useEffect(() => {
-    let inactivityTimeout: NodeJS.Timeout;
-
-    const handleUserActivity = () => {
-      clearTimeout(inactivityTimeout);
-      inactivityTimeout = setTimeout(handleLogout, INACTIVITY_TIME);
-    };
-
-    handleUserActivity();
-
-    window.addEventListener('mousemove', handleUserActivity);
-    window.addEventListener('keypress', handleUserActivity);
-    window.addEventListener('scroll', handleUserActivity);
-    return () => {
-      window.removeEventListener('mousemove', handleUserActivity);
-      window.removeEventListener('keypress', handleUserActivity);
-      window.removeEventListener('scroll', handleUserActivity);
-    };
+  const handleUserActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
   }, []);
-  const handleLogout = () => {
+
+  const handleLogout = useCallback(() => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userId');
@@ -75,34 +56,79 @@ function App() {
     localStorage.removeItem('userSpecialty');
     localStorage.removeItem('rolID');
     sessionStorage.removeItem('sessionCheck');
-  };
+  }, []);
+
+  useEffect(() => {
+    const checkInactivity = () => {
+      if (
+        isAuthenticated &&
+        Date.now() - lastActivityRef.current > INACTIVITY_TIME
+      ) {
+        handleLogout();
+      }
+    };
+
+    const inactivityInterval = setInterval(checkInactivity, 1000); // Revisar cada segundo
+
+    const activityHandler = () => {
+      handleUserActivity();
+    };
+
+    window.addEventListener('mousemove', activityHandler);
+    window.addEventListener('keypress', activityHandler);
+    window.addEventListener('scroll', activityHandler);
+
+    return () => {
+      clearInterval(inactivityInterval);
+      window.removeEventListener('mousemove', activityHandler);
+      window.removeEventListener('keypress', activityHandler);
+      window.removeEventListener('scroll', activityHandler);
+    };
+  }, [handleLogout, handleUserActivity, isAuthenticated]);
+
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === '/') {
+      handleLogout();
+    }
+  }, [location, isAuthenticated, handleLogout]);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
     localStorage.setItem('isAuthenticated', 'true');
     sessionStorage.setItem('sessionCheck', 'true');
+    lastActivityRef.current = Date.now();
   };
+
   return loading ? (
     <Loader />
   ) : (
-    <>
+    <UserProvider>
       <Routes>
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <HomePage />
+            )
+          }
+        />
         <Route
           path="/login"
           element={<Login setIsAuthenticated={handleLogin} />}
         />
         <Route
-          path="/"
+          path="/dashboard"
           element={
-            <>
-              {isAuthenticated ? (
-                <>
-                  <PageTitle title="Inicio | SaludMed" />
-                  <Dashboard setIsAuthenticated={handleLogout} />
-                </>
-              ) : (
-                <Navigate to="/login" />
-              )}
-            </>
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Inicio | SaludMed" />
+                <Dashboard setIsAuthenticated={handleLogout} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route
@@ -197,6 +223,19 @@ function App() {
           }
         />
         <Route
+          path="/recetas"
+          element={
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Recetas | SaludMed" />
+                <Prescriptions setIsAuthenticated={handleLogout} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
           path="/recetas/agregar-receta/:id"
           element={
             isAuthenticated ? (
@@ -223,12 +262,16 @@ function App() {
           }
         />
         <Route
-          path="/test"
+          path="/profile"
           element={
-            <>
-              <PageTitle title="Not Found | SaludMed" />
-              <RecetaPDF />
-            </>
+            isAuthenticated ? (
+              <>
+                <PageTitle title="Mi Perfil | SaludMed" />
+                <Perfil setIsAuthenticated={handleLogout} />
+              </>
+            ) : (
+              <Navigate to="/login" />
+            )
           }
         />
         <Route
@@ -241,7 +284,8 @@ function App() {
           }
         />
       </Routes>
-    </>
+    </UserProvider>
   );
 }
+
 export default App;

@@ -19,11 +19,13 @@ const Appointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
     const { nextAppointments, loading: loadingNext, error: errorNext } = useGetNextAppointments(Number(medicoID), Number(rolID));
 
     const formatFecha = (fecha: string) => {
-        const date = new Date(fecha);
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}-${month}-${year}`;
+        const [year, month, day] = fecha.split('-');
+        // Crear una fecha sin considerar la zona horaria local
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+        const formattedDay = String(date.getDate()).padStart(2, '0');
+        const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+        const formattedYear = date.getFullYear();
+        return `${formattedDay}-${formattedMonth}-${formattedYear}`;
     };
 
     if (loading || loadingNext) {
