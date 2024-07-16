@@ -6,6 +6,10 @@ export interface Appointments {
     telefono?: string;
     nombrePaciente: string;
     nombreMedico: string;
+    sexo?: string;
+    edad?: number;
+    peso?: number;
+    estatura?: number;
     fecha: string;
     hora: string;
     motivo:string;

@@ -175,7 +175,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                     htmlFor="nombrePaciente"
                                                 >
-                                                    Seleccionar médico {selectedDoctor?.value || 0}
+                                                    Seleccionar médico
                                                 </label>
                                                 <div className="relative">
                                                     <span className="absolute left-4.5 top-4">
@@ -200,7 +200,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                     htmlFor="nombreMedico"
                                                 >
-                                                    Nombre del Médico {formData.medicoID}
+                                                    Nombre del Médico
                                                 </label>
                                                 <div className="relative">
                                                     <span className="absolute left-4.5 top-4">
@@ -222,7 +222,7 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="nombrePaciente"
                                             >
-                                                Seleccionar paciente {selectedPatient?.value}
+                                                Seleccionar paciente
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">

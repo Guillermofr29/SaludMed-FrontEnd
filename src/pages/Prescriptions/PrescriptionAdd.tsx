@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import BreadcrumbAppointment from '../../components/Breadcrumbs/BreadcrumbAppointment';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faFilePen, faClipboardList, faHashtag, faXmark, faPrescriptionBottle, faCalendarCheck, faPlus, faEyeDropper, faArrowsRotate } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faFilePen, faClipboardList, faHashtag, faXmark, faPrescriptionBottle, faCalendarCheck, faPlus, faEyeDropper, faArrowsRotate, faNoteSticky, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import useGetAppointmentById from '../../hooks/Appointments/useGetAppointmentById';
 import { Appointments } from '../../interfaces/Appointments/Appointments';
 import { Medications } from '../../interfaces/Medications/Medications';
@@ -12,6 +12,7 @@ import { showConfirmationAlert, showSuccessAlert, showErrorAlert, showAlert } fr
 import { validateOnlyString } from '../../components/Validations/Patients/PatientValidation';
 import Select from 'react-select';
 import useGetMedications from '../../hooks/Medications/useGetMedications';
+import useGetDoctor from '../../hooks/Doctors/useGetDoctor';
 import axiosInstance from '../../api/axiosConfig';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import RecetaPDF from '../RecetaPDF';
@@ -28,6 +29,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
     const { medications, loadingMedi: medicationsLoading } = useGetMedications();
     const appointmentId = id ? parseInt(id) : undefined;
+    const {doctor} = useGetDoctor(Number(appointmentId));
     const { appointment } = useGetAppointmentById(appointmentId || 0);
     const [motivoError, setMotivoError] = useState<string | null>(null);
     const [inputValueMedi, setInputValue] = useState<string>('');
@@ -51,6 +53,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         PacienteID: 0,
         CitaID: 0,
         Diagnostico: '',
+        Recomendaciones: '',
         FechaInicio: '',
         FechaFin: '',
         RecetaID: 0,
@@ -60,6 +63,15 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         Frecuencia: ''
     });
 
+    const formatFecha = (fecha: string) => {
+        const [year, month, day] = fecha.split('-');
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+        const formattedDay = String(date.getDate()).padStart(2, '0');
+        const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+        const formattedYear = date.getFullYear();
+        return `${formattedDay}-${formattedMonth}-${formattedYear}`;
+    };
+
     const [medicamentos, setMedicamentos] = useState<(Medications & {
         dosis: string;
         cantidad: string;
@@ -68,7 +80,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
 
     const GenerarPDF = () => (
-        <PDFDownloadLink document={<RecetaPDF formData={formData} formDataPrescription={formDataPrescription} medicamentos={medicamentos} />} fileName='receta.pdf'>
+        <PDFDownloadLink document={<RecetaPDF formData={formData} formDataPrescription={formDataPrescription} medicamentos={medicamentos} doctor={doctor} />} fileName='receta.pdf'>
             {({ loading }) =>
                 loading ? 'Cargando documento...' : 'Descargar PDF'
             }
@@ -85,9 +97,9 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        if (name === 'Diagnostico') {
-            setMotivoError(validateOnlyString(value));
-        }
+        // if (name === 'Diagnostico') {
+        //     setMotivoError(validateOnlyString(value));
+        // }
 
         setFormDataPrescription({
             ...formDataPrescription,
@@ -169,9 +181,10 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                 const recetaData = {
                     pacienteID: formData.pacienteID,
                     citaID: formData.iD_Cita,
-                    diagnostico: formDataPrescription.Diagnostico,
+                    diagnostico: formatDiagnostico(formDataPrescription.Diagnostico),
                     fechaInicio: formDataPrescription.FechaInicio,
                     fechaFin: formDataPrescription.FechaFin,
+                    recomendaciones: formatDiagnostico(formDataPrescription.Recomendaciones),
                     medicamentos: medicamentos.map(med => ({
                         medicamentoID: med.iD_Medicamento,
                         dosis: med.dosis,
@@ -206,14 +219,15 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                 <h3 className="font-medium text-black dark:text-white">
                                     Información de la receta
                                 </h3>
-                                <h3>Valores de formData:</h3>
-                                <pre>{JSON.stringify(formData, null, 2)}</pre>
+                                {/* <h3>Valores de formData:</h3>
+                                <pre>{JSON.stringify(doctor, null, 2)}</pre>
+                                <pre>{JSON.stringify(formData, null, 2)}</pre> */}
                                 <div className="flex gap-4.5">
                                     <button
-                                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                                        className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
                                         type="button"
                                         onClick={() => navigate(`/citas/editar-cita/${id}`)}>
-                                        <FontAwesomeIcon icon={faClipboardList} className="mr-2 mt-1" />
+                                        <FontAwesomeIcon icon={faChevronLeft} className="mr-2 mt-1" />
                                         Regresar
                                     </button>
                                 </div>
@@ -288,7 +302,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="Diagnostico"
                                             >
-                                                Diagnóstico {formDataPrescription.Diagnostico}
+                                                Diagnóstico
                                             </label>
                                             <div className="relative">
                                                 <span className="absolute left-4.5 top-4">
@@ -301,7 +315,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     name="Diagnostico"
                                                     value={formDataPrescription.Diagnostico}
                                                     onChange={handleChange}
-                                                    onBlur={() => setMotivoError(validateOnlyString(formDataPrescription.Diagnostico))}
+                                                    // onBlur={() => setMotivoError(validateOnlyString(formDataPrescription.Diagnostico))}
 
                                                 />
                                                 {motivoError && (
@@ -315,7 +329,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="FechaInicio"
                                             >
-                                                Fecha inicio {formDataPrescription.FechaInicio}
+                                                Fecha inicio
                                             </label>
                                             <div className="relative">
                                                 <input
@@ -335,7 +349,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                 className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                 htmlFor="FechaFin"
                                             >
-                                                Fecha fin {formDataPrescription.FechaFin}
+                                                Fecha fin
                                             </label>
                                             <div className="relative">
                                                 <input
@@ -351,7 +365,26 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         </div>
                                     </div>
 
-                                    {/* ... (los campos de paciente, médico, cita no., diagnóstico, fecha inicio y fecha fin permanecen iguales) ... */}
+                                    <div className="mb-5.5">
+                                        <label
+                                            className="mb-3 block text-sm font-medium text-black dark:text-white"
+                                            htmlFor="notas"
+                                        >
+                                            Recomendaciones (opcional)
+                                        </label>
+                                        <div className="relative">
+                                            <span className="absolute left-4.5 top-4">
+                                                <FontAwesomeIcon icon={faNoteSticky} opacity="0.8" />
+                                            </span>
+                                            <input
+                                                className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                                                type="text"
+                                                name="Recomendaciones"
+                                                value={formDataPrescription.Recomendaciones || ''}
+                                                onChange={handleChange}
+                                            />
+                                        </div>
+                                    </div>
 
                                     <div className='mb-5.5'>
                                         <div className="border-b border-stroke pt-4 pb-4 dark:border-strokedark flex justify-between items-center">
@@ -364,7 +397,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                         htmlFor="nombrePaciente"
                                                     >
-                                                        Medicamento {medi.iD_Medicamento}
+                                                        Medicamento
                                                     </label>
                                                     <div className="relative">
                                                         <span className="absolute left-4.5 top-4">
@@ -389,7 +422,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                         htmlFor={`dosis-${index}`}
                                                     >
-                                                        Dosis {medi.dosis}
+                                                        Dosis
                                                     </label>
                                                     <div className="relative">
                                                         <span className="absolute left-4.5 top-4">
@@ -411,7 +444,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                         htmlFor={`cantidad-${index}`}
                                                     >
-                                                        Cantidad {medi.cantidad}
+                                                        Cantidad
                                                     </label>
                                                     <div className="relative">
                                                         <span className="absolute left-4.5 top-4">
@@ -433,7 +466,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                         className="mb-3 block text-sm font-medium text-black dark:text-white"
                                                         htmlFor={`frecuencia-${index}`}
                                                     >
-                                                        Frecuencia {medi.frecuencia}
+                                                        Frecuencia
                                                     </label>
                                                     <div className="relative">
                                                         <span className="absolute left-4.5 top-4">
