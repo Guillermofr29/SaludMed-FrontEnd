@@ -10,8 +10,6 @@ const itemsPerPage = 6;
 const maxPageNumbers = 4;
 
 const PatientTable: React.FC = () => {
-    // const rol = localStorage.getItem('rolID') || 'rolId';
-    // const MedicoID = localStorage.getItem('userId') || 'Id';
     const { patients: initialPatients, loading, error, deletePatient } = useGetPatients();
     const [patients, setPatients] = useState<Patient[]>(initialPatients);
     const [searchTerm, setSearchTerm] = useState('');
@@ -138,7 +136,7 @@ const PatientTable: React.FC = () => {
                     <FontAwesomeIcon className="p-2" icon={faUserPlus} />
                 </button>
 
-                <div className="flex items-center">
+                <div className="flex items-center pt-2">
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 0}
@@ -168,70 +166,70 @@ const PatientTable: React.FC = () => {
                 <p className="text-center text-gray-500 mt-4">Paciente no encontrado.</p>
             ) : (
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nombre
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                Médico
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Sexo
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Edad
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Peso
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Estatura
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Teléfono
-                            </th>
-                            <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Acciones
-                            </th>
+                <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Nombre
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                            Médico
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                            Sexo
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                            Edad
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                            Peso
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                            Estatura
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                            Teléfono
+                        </th>
+                        <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
+                    {currentPatients.map((patient) => (
+                        <tr key={patient.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {patient.nombre} {patient.apellido}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                                {patient.nombreMedico}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                                {patient.sexo}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                                {patient.edad}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                                {patient.peso}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                                {patient.estatura}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                                {patient.telefono}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <button className="text-meta-5" onClick={() => handleEditPatient(patient.iD_Paciente)}>
+                                    <FontAwesomeIcon className="p-2" icon={faPenToSquare} />
+                                </button>
+                                <button className="text-meta-1" onClick={() => handleDeletePatient(patient.iD_Paciente)}>
+                                    <FontAwesomeIcon className="p-2" icon={faTrash} />
+                                </button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
-                        {currentPatients.map((patient) => (
-                            <tr key={patient.iD_Paciente} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {patient.nombre} {patient.apellido}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                                    {patient.nombreMedico}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.sexo}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.edad}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.peso}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.estatura}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    {patient.telefono}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <button className="text-meta-5" onClick={() => handleEditPatient(patient.iD_Paciente)}>
-                                        <FontAwesomeIcon className="p-2" icon={faPenToSquare} />
-                                    </button>
-                                    <button className="text-meta-1" onClick={() => handleDeletePatient(patient.iD_Paciente)}>
-                                        <FontAwesomeIcon className="p-2" icon={faTrash} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                    ))}
+                </tbody>
+            </table>
             )}
         </div>
     );

@@ -128,38 +128,22 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
 
     const confirmed = await showConfirmationAlert();
 
-    // if (confirmed && formData) {
-    //   try {
-    //     let updatedData = { ...formData };
-    //     if (Number(rol) === 2 && selectedDoctor) {
-    //       updatedData.medicoID = selectedDoctor.value;
-    //     } else {
-    //       updatedData.medicoID = parseInt(medicoId);
-    //     }
-    //     await updatePatient(updatedData);
-    //     showSuccessAlert();
-    //   } catch (err) {
-    //     console.error('Error al actualizar el paciente', err);
-    //     showErrorAlert();
-    //   }
-    // }
-
     if (confirmed && formData) {
       try {
-          const updatedPatient = {
-              ...formData,
-              medicoID: Number(rol) === 2 && selectedDoctor ? selectedDoctor.value : formData.medicoID,
-          };
+        const updatedPatient = {
+          ...formData,
+          medicoID: Number(rol) === 2 && selectedDoctor ? selectedDoctor.value : formData.medicoID,
+        };
 
-          await updatePatient(updatedPatient);
-          showSuccessAlert();
+        await updatePatient(updatedPatient);
+        showSuccessAlert();
       } catch (err) {
-          console.error('Error al actualizar los datos del paciente', err);
-          showErrorAlert();
+        console.error('Error al actualizar los datos del paciente', err);
+        showErrorAlert();
       }
-  }
+    }
 
-    
+
   };
 
   const handleAppointmetsPatients = (id: number) => {
@@ -217,13 +201,13 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         <div className="grid grid-cols-3 gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-7 dark:border-strokedark flex justify-between items-center">
-                <h3 className="font-medium text-black dark:text-white">
+              <div className="border-b border-stroke py-4 px-7 dark:border-strokedark flex flex-col sm:flex-row justify-between items-center">
+                <h3 className="font-medium text-black dark:text-white mb-4 sm:mb-0">
                   Datos del paciente <FontAwesomeIcon icon={faIdCard} opacity="0.8" />
                 </h3>
-                <div className="flex gap-4.5">
+                <div className="w-full sm:w-auto">
                   <button
-                    className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                    className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90 w-full sm:w-auto"
                     type="button"
                     onClick={() => formData.iD_Paciente && handleAppointmetsPatients(formData.iD_Paciente)}>
                     <FontAwesomeIcon icon={faClipboardList} className="mr-2 mt-1" />
@@ -522,23 +506,23 @@ const PatientEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                       </div>
                     </div>
                   )}
-                  <div className="flex justify-end gap-4.5">
+                  <div className="flex flex-col sm:flex-row justify-end gap-4.5 mt-6">
                     <button
-                      className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
+                      className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white w-full sm:w-auto mb-2 sm:mb-0"
                       type="button"
                       onClick={() => navigate('/pacientes')}>
                       <FontAwesomeIcon icon={faArrowLeft} className="mr-2 mt-1" />
                       Regresar
                     </button>
                     <button
-                      className="flex justify-center rounded bg-cardGreen py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                      className="flex justify-center rounded bg-cardGreen py-2 px-6 font-medium text-gray hover:bg-opacity-90 w-full sm:w-auto mb-2 sm:mb-0"
                       type="submit"
                     >
                       Guardar
                       <FontAwesomeIcon icon={faFloppyDisk} className="ml-2 mt-1" />
                     </button>
                     <button
-                      className="flex justify-center rounded bg-red-600 py-3 px-6 font-medium text-white hover:bg-opacity-90"
+                      className="flex justify-center rounded bg-red-600 py-3 px-6 font-medium text-white hover:bg-opacity-90 w-full sm:w-auto"
                       type="button"
                       onClick={handleDelete}
                     >

@@ -24,7 +24,6 @@ const useAuthentication = ({ setIsAuthenticated }: UseAuthenticationProps) => {
 
       if (response.status === 200) {
         const { id, nombre, apellido, especialidad, rolID } = response.data;
-        // Aquí puedes almacenar los datos en el almacenamiento local o en el estado global si lo necesitas
         localStorage.setItem('userId', id);
         localStorage.setItem('userName', `${nombre} ${apellido}`);
         localStorage.setItem('userSpecialty', especialidad);

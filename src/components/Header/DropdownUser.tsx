@@ -43,19 +43,6 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ setIsAuthenticated }) => {
     return () => document.removeEventListener('keydown', keyHandler);
   });
 
-  // useEffect(() => {
-  //   const handleStorageChange = () => {
-  //     setNombre(localStorage.getItem('userName') || 'Nombre');
-  //     setEspecialidad(localStorage.getItem('userSpecialty') || 'Especialidad');
-  //   };
-
-  //   window.addEventListener('storage', handleStorageChange);
-
-  //   return () => {
-  //     window.removeEventListener('storage', handleStorageChange);
-  //   };
-  // }, []);
-
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('isAuthenticated');

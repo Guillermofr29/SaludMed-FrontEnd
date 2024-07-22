@@ -3,7 +3,6 @@ import CardDashboard from '../../components/Cards/Dashboard/CardDashboard';
 import MostCommonDiseases from '../../components/Charts/MostCommonDiseases';
 import QuantityBySex from '../../components/Charts/QuantityBySex';
 import TableLastAppointments from '../../components/Tables/Dashboard/TableLastAppointments';
-import TableMostPrescripMed from '../../components/Tables/Dashboard/TableMostPrescripMed';
 import DefaultLayout from '../../layout/DefaultLayout';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,7 +12,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import useDashboardData from '../../hooks/Dashboard/useDashboardData';
 import { useUser } from '../../context/UserContext';
-// import HeatMap from '../HeatMap';
 
 interface DashboardProps {
   setIsAuthenticated: (isAuthenticated: boolean) => void;
@@ -22,7 +20,7 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   const { user } = useUser();
   const MedicoID = localStorage.getItem('userId') || 'Id';
-  const [nombreDoctor, setNombreDoctor] = useState(
+  const [, setNombreDoctor] = useState(
     localStorage.getItem('userName') || 'Nombre',
   );
   const { data, loading, error } = useDashboardData(Number(MedicoID));
@@ -96,10 +94,9 @@ const Dashboard: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         <div className="col-span-12 xl:col-span-6">
           <TableLastAppointments />
         </div>
-        <div className="col-span-12 xl:col-span-6">
-          {/* <HeatMap /> */}
+        {/* <div className="col-span-12 xl:col-span-6">
           <TableMostPrescripMed />
-        </div>
+        </div> */}
       </div>
     </DefaultLayout>
   );

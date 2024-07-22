@@ -1,26 +1,26 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import React, { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import Login from './pages/Login';
-import NotFound from './pages/NotFound';
-import Dashboard from './pages/Dashboard/Dashboard';
-import Patients from './pages/Patients/Patients';
-import PatientEdit from './pages/Patients/PatientEdit';
-import PatientAdd from './pages/Patients/PatientAdd';
-import PatientAppointments from './pages/Patients/PatientAppointments';
-import Citas from './pages/Appointments/Appointments';
-import AppointmentEdit from './pages/Appointments/AppointmentEdit';
-import AppointmentAdd from './pages/Appointments/AppointmentAdd';
-import PrescriptionAdd from './pages/Prescriptions/PrescriptionAdd';
-import PrescriptionEdit from './pages/Prescriptions/PrescriptionEdit';
-import Prescriptions from './pages/Prescriptions/Prescriptions';
-import Perfil from './pages/Perfil/Perfil';
-import HomePage from './pages/HomePage/Context';
 import { UserProvider } from './context/UserContext';
+import 'react-calendar/dist/Calendar.css';
 
-const INACTIVITY_TIME = 960000; // 10 minutos
-//20000 20 segundos
+const Login = React.lazy(() => import('./pages/Login'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard/Dashboard'));
+const Patients = React.lazy(() => import('./pages/Patients/Patients'));
+const PatientEdit = React.lazy(() => import('./pages/Patients/PatientEdit'));
+const PatientAdd = React.lazy(() => import('./pages/Patients/PatientAdd'));
+const PatientAppointments = React.lazy(() => import('./pages/Patients/PatientAppointments'));
+const Citas = React.lazy(() => import('./pages/Appointments/Appointments'));
+const AppointmentEdit = React.lazy(() => import('./pages/Appointments/AppointmentEdit'));
+const AppointmentAdd = React.lazy(() => import('./pages/Appointments/AppointmentAdd'));
+const PrescriptionAdd = React.lazy(() => import('./pages/Prescriptions/PrescriptionAdd'));
+const Prescriptions = React.lazy(() => import('./pages/Prescriptions/Prescriptions'));
+const Perfil = React.lazy(() => import('./pages/Perfil/Perfil'));
+const HomePage = React.lazy(() => import('./pages/HomePage/Context'));
+
+const INACTIVITY_TIME = 960000;
 
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,7 +68,7 @@ function App() {
       }
     };
 
-    const inactivityInterval = setInterval(checkInactivity, 1000); // Revisar cada segundo
+    const inactivityInterval = setInterval(checkInactivity, 1000);
 
     const activityHandler = () => {
       handleUserActivity();
@@ -103,7 +103,8 @@ function App() {
     <Loader />
   ) : (
     <UserProvider>
-      <Routes>
+      <Suspense fallback={<Loader />}>
+         <Routes>
         <Route
           path="/"
           element={
@@ -249,19 +250,6 @@ function App() {
           }
         />
         <Route
-          path="/recetas/editar-receta/:id"
-          element={
-            isAuthenticated ? (
-              <>
-                <PageTitle title="Recetas | SaludMed" />
-                <PrescriptionEdit setIsAuthenticated={handleLogout} />
-              </>
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
           path="/profile"
           element={
             isAuthenticated ? (
@@ -284,6 +272,7 @@ function App() {
           }
         />
       </Routes>
+      </Suspense>
     </UserProvider>
   );
 }

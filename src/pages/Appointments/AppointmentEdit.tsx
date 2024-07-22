@@ -175,13 +175,13 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                 <div className="grid grid-cols-3 gap-8">
                     <div className="col-span-5 xl:col-span-3">
                         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                            <div className="border-b border-stroke py-4 px-7 dark:border-strokedark flex justify-between items-center">
-                                <h3 className="font-medium text-black dark:text-white">
+                            <div className="border-b border-stroke py-4 px-4 sm:px-7 dark:border-strokedark flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                                <h3 className="font-medium text-black dark:text-white mb-4 sm:mb-0">
                                     Información de la cita
                                 </h3>
-                                <div className="flex gap-4.5">
+                                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                                     <button
-                                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-90 w-full sm:w-auto"
                                         type="button"
                                         onClick={() => navigate(`/pacientes/editar-paciente/${formData.pacienteID}`)}
                                     >
@@ -189,10 +189,9 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         Ver info del paciente
                                     </button>
                                     <button
-                                        className="flex justify-center rounded bg-meta-7 py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                                        className="flex justify-center rounded bg-meta-7 py-2 px-6 font-medium text-gray hover:bg-opacity-90 w-full sm:w-auto"
                                         type="button"
                                         onClick={() => navigate(`/recetas/agregar-receta/${id}`)}
-                                    // onClick={() => formData.iD_Paciente && handleAppointmetsPatients(formData.iD_Paciente)}
                                     >
                                         <FontAwesomeIcon icon={faFileWaveform} className="mr-2 mt-1" />
                                         Generar receta
@@ -287,7 +286,7 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                                     placeholder="mm/dd/yyyy"
                                                     value={formData?.fecha || ''}
                                                     onChange={handleChange}
-                                                    min={new Date().toISOString().split('T')[0]}
+                                                // min={new Date().toISOString().split('T')[0]}
                                                 />
                                             </div>
                                         </div>
@@ -381,9 +380,7 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         </label>
                                         <div className="relative">
                                             <span className="absolute left-4.5 top-4">
-                                                <g opacity="0.8">
-                                                    <FontAwesomeIcon icon={faNoteSticky} />
-                                                </g>
+                                                <FontAwesomeIcon icon={faNoteSticky} opacity="0.8" />
                                             </span>
                                             <input
                                                 className="w-full rounded border border-stroke py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
@@ -395,22 +392,22 @@ const AppointmentEdit: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                                         </div>
                                     </div>
 
-                                    <div className="flex justify-end gap-4.5">
+                                    <div className="flex flex-col sm:flex-row justify-end gap-4.5">
                                         <button
-                                            className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
+                                            className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white w-full sm:w-auto mb-2 sm:mb-0"
                                             type="button"
                                             onClick={() => navigate('/citas')}
                                         >
                                             Cancelar
                                         </button>
                                         <button
-                                            className="flex justify-center rounded bg-cardGreen py-2 px-6 font-medium text-gray hover:bg-opacity-90"
+                                            className="flex justify-center rounded bg-cardGreen py-2 px-6 font-medium text-gray hover:bg-opacity-90 w-full sm:w-auto mb-2 sm:mb-0"
                                             type="submit"
                                         >
                                             Guardar
                                         </button>
                                         <button
-                                            className="flex justify-center rounded bg-red-600 py-3 px-6 font-medium text-white hover:bg-opacity-90"
+                                            className="flex justify-center rounded bg-red-600 py-3 px-6 font-medium text-white hover:bg-opacity-90 w-full sm:w-auto"
                                             type="button"
                                             onClick={handleDelete}
                                         >

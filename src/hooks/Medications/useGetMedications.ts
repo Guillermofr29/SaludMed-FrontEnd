@@ -22,16 +22,7 @@ const useGetMedications = () => {
         fetchMedications();
     }, []);
 
-    // const deletePatient = async (id: number) => {
-    //     try {
-    //         await axiosInstance.delete(`Paciente/${id}`);
-    //         setMedications(prevPatients => prevPatients.filter(patient => patient.iD_Paciente !== id));
-    //     } catch (err) {
-    //         setError('Error al eliminar el paciente');
-    //     }
-    // };
-
-    return { medications, loadingMedi, error, /*deletePatient*/ };
+    return { medications, loadingMedi, error };
 };
 
 export default useGetMedications;

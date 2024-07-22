@@ -24,7 +24,6 @@ const AppointmentsTable: React.FC = () => {
 
     const formatFecha = (fecha: string) => {
         const [year, month, day] = fecha.split('-');
-        // Crear una fecha sin considerar la zona horaria local
         const date = new Date(Number(year), Number(month) - 1, Number(day));
         const formattedDay = String(date.getDate()).padStart(2, '0');
         const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
@@ -161,7 +160,7 @@ const AppointmentsTable: React.FC = () => {
                     <button
                         id="dropdownActionButton"
                         onClick={toggleDropdown}
-                        className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                        className="mb-2 inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                         type="button"
                     >
                         {selectedOption ? selectedOption : 'Filtrar por estatus'}
@@ -227,13 +226,13 @@ const AppointmentsTable: React.FC = () => {
                 </div>
                 <button
                     onClick={handleAddAppointment}
-                    className="ml-4 inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-cardGreen rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                    className="ml-4 mt-2 inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-cardGreen rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                 >
                     Agendar Cita
                     <FontAwesomeIcon className="p-2" icon={faCalendarPlus} />
                 </button>
 
-                <div className="flex items-center">
+                <div className="flex items-center pt-2">
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 0}
@@ -262,94 +261,94 @@ const AppointmentsTable: React.FC = () => {
             {currentAppointments.length === 0 ? (
                 <p className="text-center text-gray-500 mt-4">Cita no encontrada.</p>
             ) : (
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-800">
-                        <tr>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Cita No.
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Paciente
-                            </th>
-                            {rol === '2' && (
-                                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                    Médico
-                                </th>
+<table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+    <thead className="bg-gray-50 dark:bg-gray-800">
+        <tr>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg">
+                Cita No.
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Paciente
+            </th>
+            {rol === '2' && (
+                <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    Médico
+                </th>
+            )}
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                Fecha
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                Hora
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                Motivo
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                Notas
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                Estatus
+            </th>
+            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+            </th>
+        </tr>
+    </thead>
+    <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
+        {currentAppointments.map((appointment) => (
+            <tr key={appointment.iD_Cita} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg">
+                    CIT{appointment.iD_Cita}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {appointment.nombrePaciente}
+                </td>
+                {rol === '2' && (
+                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
+                        {appointment.nombreMedico}
+                    </td>
+                )}
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                    {formatFecha(appointment.fecha)}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                    {appointment.hora}
+                </td>
+                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden xl:table-cell">
+                    {appointment.motivo}
+                </td>
+                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden xl:table-cell">
+                    {appointment.notas}
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+                    <p className={`${getStatusClassName(appointment.estatus)}`}>
+                        <span className="pr-1">
+                            {appointment.estatus === 'Pendiente' && (
+                                <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
                             )}
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                Fecha
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                                Hora
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Motivo
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Notas
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                                Estatus
-                            </th>
-                            <th scope="col" className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Acciones
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y text-center divide-gray-200 dark:divide-gray-700">
-                        {currentAppointments.map((appointment) => (
-                            <tr key={appointment.iD_Cita} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    CIT{appointment.iD_Cita}
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {appointment.nombrePaciente}
-                                </td>
-                                {rol === '2' && (
-                                    <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                        {appointment.nombreMedico}
-                                    </td>
-                                )}
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                                    {formatFecha(appointment.fecha)}
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
-                                    {appointment.hora}
-                                </td>
-                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden lg:table-cell">
-                                    {appointment.motivo}
-                                </td>
-                                <td className="px-4 py-4 whitespace-normal text-sm text-gray-500 hidden lg:table-cell">
-                                    {appointment.notas}
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 hidden lg:table-cell">
-                                    <p className={`${getStatusClassName(appointment.estatus)}`}>
-                                        <span className="pr-1">
-                                            {appointment.estatus === 'Pendiente' && (
-                                                <FontAwesomeIcon icon={faCalendarDay} opacity="0.8" />
-                                            )}
-                                            {appointment.estatus === 'Terminada' && (
-                                                <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
-                                            )}
-                                            {appointment.estatus === 'Cancelada' && (
-                                                <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
-                                            )}
-                                        </span>
-                                        {appointment.estatus}
-                                    </p>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <button className="text-meta-5" onClick={() => appointment.iD_Cita && handleEditAppointment(appointment.iD_Cita)}>
-                                        <FontAwesomeIcon className="p-2" icon={faPenToSquare} />
-                                    </button>
-                                    <button className="text-meta-1" onClick={() => appointment.iD_Cita && handleDeleteAppointment(appointment.iD_Cita)}>
-                                        <FontAwesomeIcon className="p-2" icon={faTrash} />
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                            {appointment.estatus === 'Terminada' && (
+                                <FontAwesomeIcon icon={faCalendarCheck} opacity="0.8" />
+                            )}
+                            {appointment.estatus === 'Cancelada' && (
+                                <FontAwesomeIcon icon={faCalendarXmark} opacity="0.8" />
+                            )}
+                        </span>
+                        {appointment.estatus}
+                    </p>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button className="text-meta-5" onClick={() => appointment.iD_Cita && handleEditAppointment(appointment.iD_Cita)}>
+                        <FontAwesomeIcon className="p-2" icon={faPenToSquare} />
+                    </button>
+                    <button className="text-meta-1" onClick={() => appointment.iD_Cita && handleDeleteAppointment(appointment.iD_Cita)}>
+                        <FontAwesomeIcon className="p-2" icon={faTrash} />
+                    </button>
+                </td>
+            </tr>
+        ))}
+    </tbody>
+</table>
             )}
         </div>
     );

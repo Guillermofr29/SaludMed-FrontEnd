@@ -7,9 +7,6 @@ import {
   faUserInjured,
   faCalendar,
   faFileWaveform,
-  faUserDoctor,
-  faPills,
-  faArrowLeft,
   faRightFromBracket,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -24,7 +21,7 @@ const Sidebar = ({
   setSidebarOpen,
   setIsAuthenticated,
 }: SidebarProps) => {
-  // const rol = localStorage.getItem('rolID') || 'rolId';
+
   const location = useLocation();
   const { pathname } = location;
   const navigate = useNavigate();
@@ -37,7 +34,6 @@ const Sidebar = ({
     storedSidebarExpanded === null ? false : storedSidebarExpanded === 'true',
   );
 
-  // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: MouseEvent) => {
       if (!sidebar.current || !trigger.current) return;
@@ -53,7 +49,6 @@ const Sidebar = ({
     return () => document.removeEventListener('click', clickHandler);
   });
 
-  // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }: KeyboardEvent) => {
       if (!sidebarOpen || keyCode !== 27) return;

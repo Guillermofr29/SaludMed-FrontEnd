@@ -4,7 +4,7 @@ import useGetAppointmentByIdPatient from '../../hooks/Patients/useGetAppointment
 import DefaultLayout from '../../layout/DefaultLayout';
 import { Appointments } from '../../interfaces/Appointments/Appointments';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faCalendarCheck, faCalendarDay, faCalendarXmark, faComment, faEnvelope, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCalendarCheck, faCalendarDay, faCalendarXmark, faEnvelope, faFilter } from '@fortawesome/free-solid-svg-icons';
 import emailjs from 'emailjs-com';
 import { showConfirmationAlert, showSuccessAlert, showErrorAlert } from '../../components/Alerts/SendMsjAlert';
 
@@ -125,7 +125,6 @@ const PatientAppointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) =
                         className="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-boxdark dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                         type="button"
                     >
-                        Filtrar por:
                         {selectedOption ? selectedOption : 'Filtrar por estatus'}
                         <FontAwesomeIcon className="p-2" icon={faFilter} />
                     </button>
@@ -194,13 +193,13 @@ const PatientAppointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) =
                                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Hora
                                 </th>
-                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                                     Motivo
                                 </th>
-                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                     Médico
                                 </th>
-                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
                                     Estatus
                                 </th>
                                 <th className="px-4 py-2 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -213,9 +212,9 @@ const PatientAppointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) =
                                 <tr key={appointment.iD_Cita}>
                                     <td className="text-center px-4 py-4 whitespace-nowrap">{formatFecha(appointment.fecha)}</td>
                                     <td className="text-center px-4 py-4 whitespace-nowrap">{appointment.hora}</td>
-                                    <td className="text-center px-4 py-4 whitespace-nowrap">{appointment.motivo}</td>
-                                    <td className="text-center px-4 py-4 whitespace-nowrap">{appointment.nombreMedico}</td>
-                                    <td className="text-center px-4 py-4 whitespace-nowrap ">
+                                    <td className="text-center px-4 py-4 whitespace-nowrap hidden md:table-cell">{appointment.motivo}</td>
+                                    <td className="text-center px-4 py-4 whitespace-nowrap hidden lg:table-cell">{appointment.nombreMedico}</td>
+                                    <td className="text-center px-4 py-4 whitespace-nowrap hidden lg:table-cell">
                                         <p className={`${getStatusClassName(appointment.estatus)}`}>
                                             <span className="pr-1">
                                                 {appointment.estatus === 'Pendiente' && (
@@ -234,9 +233,6 @@ const PatientAppointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) =
                                     <td className="px-4 py-4 text-center whitespace-nowrap text-sm text-gray-500">
                                         <button className="text-meta-5" onClick={() => sendEmail(appointment)}>
                                             <FontAwesomeIcon className="p-2" icon={faEnvelope} />
-                                        </button>
-                                        <button className="text-meta-1" >
-                                            <FontAwesomeIcon className="p-2" icon={faComment} />
                                         </button>
                                     </td>
                                 </tr>

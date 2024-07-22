@@ -1,5 +1,4 @@
 export interface AppointmentAddi {
-    // iD_Cita?: number;
     nombreMedico?: string;
     PacienteID: number;
     medicoID: number;

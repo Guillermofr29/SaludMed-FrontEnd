@@ -2,8 +2,7 @@ import React from 'react';
 import Header from '../../components/Header/HomePage/Header';
 import Footer from '../../components/Footer/Footer';
 import Carrusel from '../../components/Slider/SliderHomePage';
-import Form from '../../components/Slider/SliderHomePage2';
-import MapsGoogle from '../../components/Maps/MapaMarcador';
+import GoogleMap from '../../components/Maps/GoogleMap';
 import PexelsVideoCarousel from '../../components/Slider/SliderHomePagev2';
 import NewsContainer from '../../components/Cards/NewsApi/NewsContainer';
 import Features from '../../components/Features/Features';
@@ -62,7 +61,7 @@ const HomePage: React.FC = () => {
 
         <Features />
 
-        <section className="mt-8 lg:mt-12 px-6 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-8 p-8">
+        {/* <section className="mt-8 lg:mt-12 px-6 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-8 p-8">
           <div className="flex justify-center items-center order-last md:order-first">
             <div className="w-full md:w-3/4 lg:w-full">
               <PexelsVideoCarousel />
@@ -104,19 +103,26 @@ const HomePage: React.FC = () => {
               Más...
             </button>
           </div>
-        </section>
+        </section> */}
 
-        <div className="hidden md:block">
+        {/* <div className="hidden md:block">
           <Form />
-        </div>
+        </div> */}
 
         <section className="mt-8 lg:mt-12 px-6 max-w-7xl mx-auto">
           <h2 className="text-2xl font-bold mb-6 text-center">
             Encuentra nuestra clínica
           </h2>
-          <MapsGoogle />
-          <NewsContainer />
+          <div className="flex justify-center items-center">
+            <div className="w-full sm:w-3/4 md:w-2/3 lg:w-1/2">
+              <GoogleMap />
+            </div>
+          </div>
+          <div>
+          <NewsContainer/>
+          </div>
         </section>
+
       </main>
       <Footer />
     </>

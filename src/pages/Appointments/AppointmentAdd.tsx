@@ -112,20 +112,6 @@ const AppointmentAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
             console.error('Error al agregar la cita', err);
             showErrorAlert();
         }
-
-        // try {
-        //     const formattedData = {
-        //         ...formData,
-        //         PacienteID: selectedPatient.value,
-        //         motivo: formatMotivo(formData.motivo),
-        //         medicoID: parseInt(medicoId),
-        //         estatus: 'Pendiente',
-        //     };
-        //     await addAppointment(formattedData);
-        // } catch (err) {
-        //     console.error('Error al agregar la cita', err);
-        //     showErrorAlert();
-        // }
     };
 
     const handleInputChange = (newValue: string) => {

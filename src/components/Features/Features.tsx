@@ -1,51 +1,46 @@
 import React from 'react';
 import FeatureCard from './FeatureCard';
 import {
-  FaClinicMedical,
-  FaLaptopMedical,
-  FaCalendarAlt,
+  FaUserMd,
+  FaCalendarCheck,
+  FaPrescription,
   FaMobileAlt,
-  FaFileInvoiceDollar,
-  FaBullhorn,
+  FaFilePdf,
+  FaChartLine,
 } from 'react-icons/fa';
 
 const Features: React.FC = () => {
+
   const features = [
     {
-      title: 'EXPEDIENTE CLÍNICO ELECTRÓNICO',
-      description:
-        'Mantén organizada la información de tus pacientes y cumple con los lineamientos de la NOM y Secretaría de Salud.',
-      icon: <FaClinicMedical size={40} />,
+      title: 'GESTIÓN DE PACIENTES',
+      description: 'Administra eficientemente los datos de tus pacientes, incluyendo historiales médicos, información de contacto y seguimiento de tratamientos.',
+      icon: <FaUserMd size={40} />,
     },
     {
-      title: 'TELEMEDICINA ELEONOR',
-      description:
-        '¡Un gran paso al futuro! Ahora puedes brindar tu servicio médico a distancia.',
-      icon: <FaLaptopMedical size={40} />,
+      title: 'GESTIÓN DE CITAS',
+      description: 'Organiza y programa citas de manera eficiente, evitando conflictos de horarios y optimizando el tiempo de tu clínica.',
+      icon: <FaCalendarCheck size={40} />,
     },
     {
-      title: 'AGENDA MÉDICA EN LÍNEA',
-      description:
-        'Maneja tu agenda médica en línea desde tu móvil y coordínala con tu asistente.',
-      icon: <FaCalendarAlt size={40} />,
+      title: 'GESTIÓN DE RECETAS',
+      description: 'Crea y administra recetas médicas de forma digital, asegurando precisión en las prescripciones y facilitando el seguimiento de medicamentos.',
+      icon: <FaPrescription size={40} />,
     },
     {
-      title: 'APP DEL MÉDICO',
-      description:
-        'Con la aplicación móvil puedes consultar tu agenda en tiempo real y revisar los expedientes de tus pacientes fuera del consultorio.',
+      title: 'APP PORTABLE',
+      description: 'Con la aplicación móvil puedes consultar tu agenda en tiempo real y revisar los expedientes de tus pacientes fuera del consultorio.',
       icon: <FaMobileAlt size={40} />,
     },
     {
-      title: 'FACTURACIÓN ELECTRÓNICA',
-      description:
-        '¡Dile adiós a los complicados programas de Facturación! Ahora desde Eleonor genera tus facturas médicas más rápido y de una forma sencilla.',
-      icon: <FaFileInvoiceDollar size={40} />,
+      title: 'GENERACION DE RECETA PDF',
+      description: 'Genera recetas en formato PDF de manera rápida y sencilla, facilitando su impresión o envío electrónico a los pacientes.',
+      icon: <FaFilePdf size={40} />,
     },
     {
-      title: 'MARKETING',
-      description:
-        '¡Atrae nuevos pacientes! Haz que te encuentren más rápido en los buscadores de Google dentro de nuestro Directorio Médico.',
-      icon: <FaBullhorn size={40} />,
+      title: 'VISUALIZACIÓN DE DATOS CLINICOS',
+      description: 'Accede y analiza datos clínicos de manera intuitiva con gráficos y estadísticas, permitiendo un mejor seguimiento y toma de decisiones.',
+      icon: <FaChartLine size={40} />,
     },
   ];
 

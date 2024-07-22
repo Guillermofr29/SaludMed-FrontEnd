@@ -76,6 +76,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
         dosis: string;
         cantidad: string;
         frecuencia: string;
+        pacienteID: number;
     })[]>([]);
 
 
@@ -118,6 +119,7 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
             forma: '',
             efectosSecundarios: '',
             dosis: '',
+            pacienteID: 0,
             cantidad: '',
             frecuencia: ''
         }]);
@@ -189,7 +191,8 @@ const PrescriptionAdd: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                         medicamentoID: med.iD_Medicamento,
                         dosis: med.dosis,
                         cantidad: med.cantidad,
-                        frecuencia: med.frecuencia
+                        frecuencia: med.frecuencia,
+                        pacienteID: formData.pacienteID,
                     }))
                 };
 

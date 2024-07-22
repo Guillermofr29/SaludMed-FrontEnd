@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import DefaultLayout from '../../layout/DefaultLayout';
 import usePerfil from '../../hooks/Perfil/usePerfil';
@@ -12,6 +13,7 @@ interface DashboardProps {
 const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
   const id = parseInt(localStorage.getItem('userId') || '0');
   const { medico, loading, error, updateMedico } = usePerfil(id);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -243,6 +245,7 @@ const Perfil: React.FC<DashboardProps> = ({ setIsAuthenticated }) => {
                   <button
                     className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
                     type="button"
+                    onClick={()=>navigate('/dashboard')}
                   >
                     Cancelar
                   </button>
