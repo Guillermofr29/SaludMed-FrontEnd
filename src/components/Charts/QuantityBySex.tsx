@@ -71,7 +71,7 @@ const ChartQuantityBySex: React.FC = () => {
                 breakpoint: 2600,
                 options: {
                     chart: {
-                        width: 380,
+                        width: '100%',
                     },
                 },
             },
@@ -79,7 +79,15 @@ const ChartQuantityBySex: React.FC = () => {
                 breakpoint: 640,
                 options: {
                     chart: {
-                        width: 200,
+                        width: '100%',
+                        height: 300,
+                    },
+                    yaxis: {
+                        labels: {
+                            style: {
+                                fontSize: '10px',
+                            },
+                        },
                     },
                 },
             },
@@ -92,16 +100,16 @@ const ChartQuantityBySex: React.FC = () => {
     ];
 
     return (
-        <div className="sm:px-7.5 col-span-12 rounded-sm border border-stroke bg-white px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6">
+        <div className="col-span-12 rounded-sm border border-stroke bg-white px-2 sm:px-5 pb-5 pt-7.5 shadow-default dark:border-strokedark dark:bg-boxdark xl:col-span-6">
             <div className="mb-3 justify-between gap-4 sm:flex">
                 <div>
-                    <h5 className="text-xl font-semibold text-black dark:text-white">Cantidad por Sexo</h5>
+                    <h5 className="text-lg sm:text-xl font-semibold text-black dark:text-white">Cantidad por Sexo</h5>
                 </div>
             </div>
 
             <div className="mb-2">
                 <div id="chartBar" className="mx-auto flex justify-center">
-                    <ReactApexChart options={options} series={series} type="bar" height={350} />
+                    <ReactApexChart options={options} series={series} type="bar" height={350} width="100%" />
                 </div>
             </div>
         </div>
