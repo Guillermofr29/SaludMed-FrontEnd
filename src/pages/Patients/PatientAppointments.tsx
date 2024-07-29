@@ -19,15 +19,12 @@ const PatientAppointments: React.FC<DashboardProps> = ({ setIsAuthenticated }) =
     const navigate = useNavigate();
     const { appointmentsPatient: initialAppointments, loading, error } = useGetAppointmentByIdPatient(Number(patientId));
 
-
-    //
     const [appointmentsPatient, setAppointments] = useState<Appointments[]>(initialAppointments);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<string | null>('Pendiente');
 
     const formatFecha = (fecha: string) => {
         const [year, month, day] = fecha.split('-');
-        // Crear una fecha sin considerar la zona horaria local
         const date = new Date(Number(year), Number(month) - 1, Number(day));
         const formattedDay = String(date.getDate()).padStart(2, '0');
         const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');

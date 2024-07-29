@@ -23,7 +23,7 @@ const NewsContainer: React.FC = () => {
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   return (
-    <div>
+    <div className='mx-8'>
       <NewsGrid news={currentNews} />
       <Pagination
         newsPerPage={newsPerPage}

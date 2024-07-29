@@ -13,13 +13,18 @@ interface NewsGridProps {
 
 const NewsGrid: React.FC<NewsGridProps> = ({ news }) => {
   return (
-    <div className="p-10">
-      <h2 className="text-2xl font-bold text-center mb-6 text-blue-600 p-10">
+    <div className="p-5">
+      <h2 className="text-2xl font-bold text-center mb-2 text-blue p-10">
         Noticias relevantes
       </h2>
       <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4">
         {news.map((item, index) => (
-          <NewsCard key={index} image={item.urlToImage} url={item.url} />
+          <NewsCard 
+            key={index} 
+            image={item.urlToImage} 
+            url={item.url} 
+            title={item.title}
+          />
         ))}
       </div>
     </div>
